@@ -1,0 +1,2176 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tienda de ropa - Catálogo </title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+        }
+           /* Oculta la tarjeta blanca entera si el producto no tiene una imagen cargada */
+            .product-card:not(:has(img)) {
+            display: none !important;
+        }
+        body {
+            background-color: #f4f6f9;
+            color: #333;
+        }
+
+        /* Barra de anuncio */
+        .promo-bar {
+            background-color: #1e272e;
+            color: #fff;
+            text-align: center;
+            padding: 10px;
+            font-size: 14px;
+            font-weight: bold;
+            letter-spacing: 0.5px;
+        }
+
+        /* Encabezado */
+       /* Header configurado en columna para que el logo ocupe todo el ancho */
+        /* Header simplificado y enfocado en el logo */
+        header.full-header {
+            background: #111111; /* Fondo oscuro igual al de la imagen del logo */
+            padding: 15px 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+        }
+
+        /* Banner del Logo destacado */
+        .logo-banner {
+            width: 100%;
+            max-width: 1200px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 0 20px;
+        }
+
+        .logo-banner a {
+            display: inline-block;
+            text-align: center;
+        }
+
+        .logo-banner img {
+            width: auto;
+            max-width: 100%;
+            /* Aumentamos el alto límite para que se vean bien las alas y las letras */
+            height: 220px; 
+            object-fit: contain; /* Garantiza que el logo se vea completo sin recortar nada */
+            display: block;
+        }
+
+        /* Ajuste para pantallas de celulares */
+        @media (max-width: 600px) {
+            .logo-banner img {
+                height: 140px;
+            }
+}
+        /* Contenedor Principal */
+        .main-container {
+            max-width: 1300px;
+            margin: 30px auto;
+            padding: 0 20px;
+            display: grid;
+            grid-template-columns: 240px 1fr;
+            gap: 30px;
+        }
+
+        /* Filtros Laterales */
+        .sidebar {
+            background: #ffffff;
+            padding: 20px;
+            border-radius: 8px;
+            height: fit-content;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+        }
+
+        .sidebar h3 {
+            font-size: 16px;
+            margin-bottom: 15px;
+            color: #1e272e;
+            border-bottom: 2px solid #f1f2f6;
+            padding-bottom: 8px;
+        }
+
+        .filter-list {
+            list-style: none;
+        }
+
+        .filter-list li {
+            margin-bottom: 10px;
+        }
+
+        .filter-list a {
+            color: #57606f;
+            text-decoration: none;
+            font-size: 14px;
+            transition: color 0.2s;
+            display: block;
+        }
+
+        .filter-list a:hover, .filter-list a.active {
+            color: #3b5998;
+            font-weight: bold;
+        }
+
+        /* Grid de Productos */
+        .products-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+            gap: 20px;
+        }
+
+        /* Tarjeta de Producto */
+        .product-card {
+            background: #ffffff;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+            display: flex;
+            flex-direction: column;
+            transition: transform 0.2s, box-shadow 0.2s;
+            border: 1px solid #eccc6822;
+        }
+
+        .product-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 16px rgba(0,0,0,0.1);
+        }
+
+        .product-img {
+            width: 100%;
+            aspect-ratio: 1;
+            background-color: #f1f2f6;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #a4b0be;
+            font-size: 12px;
+            font-weight: bold;
+            text-align: center;
+            padding: 10px;
+            position: relative;
+            background-size: cover;
+            background-position: center;
+        }
+        .product-img img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover; /* Recorta la imagen proporcionalmente para llenar el recuadro */
+        }
+
+        .badge-tag {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            background: #ff4757;
+            color: white;
+            padding: 3px 8px;
+            font-size: 11px;
+            font-weight: bold;
+            border-radius: 4px;
+        }
+
+        .product-info {
+            padding: 15px;
+            display: flex;
+            flex-direction: column;
+            flex-grow: 1;
+        }
+
+        .product-cat {
+            font-size: 11px;
+            color: #a4b0be;
+            text-transform: uppercase;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+
+        .product-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: #2f3542;
+            margin-bottom: 10px;
+            line-height: 1.4;
+            height: 40px;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        .price-row {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-top: auto;
+            margin-bottom: 15px;
+        }
+
+        .price-new {
+            font-size: 16px;
+            font-weight: bold;
+            color: #2ed573;
+        }
+
+        .price-old {
+            font-size: 13px;
+            text-decoration: line-through;
+            color: #a4b0be;
+        }
+
+        /* Botón WhatsApp */
+        .btn-whatsapp {
+            background-color: #25d366;
+            color: white;
+            text-decoration: none;
+            text-align: center;
+            padding: 10px;
+            border-radius: 6px;
+            font-size: 13px;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 5px;
+            transition: background 0.2s;
+        }
+        /* Etiqueta sencilla para el Talle */
+        .product-size-text {
+            font-size: 12px;
+            font-weight: 600;
+            color: #4b6584;
+            margin-bottom: 8px;
+        }
+
+        .product-size-text span {
+            background-color: #f1f2f6;
+            color: #2f3542;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-weight: bold;
+        }
+        .btn-whatsapp:hover {
+            background-color: #1ebd56;
+        }
+
+        /* Responsivo */
+        @media (max-width: 900px) {
+            .main-container {
+                grid-template-columns: 1fr;
+            }
+            .sidebar {
+                display: none; /* Ocultar filtros en móviles para simplificar */
+            }
+            .search-bar {
+                width: 50%;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="promo-bar">
+         Todas la prendas de ropa disponibles de la semana  
+    </div>
+
+    <!-- En el <header> de tu HTML -->
+    <header class="full-header">
+        <div class="logo-banner">
+            <a href="#">
+                <img src="images/logo valkyria.jpeg" alt="VALKYRIA MODA">
+            </a>
+        </div>
+    </header>
+    <div class="main-container">
+        
+        <!-- Barra Lateral de Categorías -->
+        <aside class="sidebar">
+            <h3>Categorías</h3>
+            <ul class="filter-list">
+                <li><a href="#" class="active" onclick="filterCategory('todos')">Todos los Productos (22)</a></li>
+                <li><a href="#" onclick="filterCategory('Remeras')">Remeras y camisas</a></li>
+                <li><a href="#" onclick="filterCategory('Pantalones')">Pantalones</a></li>
+                <li><a href="#" onclick="filterCategory('Abrigos')">Abrigos y buzos</a></li>
+                <li><a href="#" onclick="filterCategory('Accesorios')">Accesorios y otros</a></li>
+            </ul>
+        </aside>
+
+        <!-- Grid Contenedor de los Productos -->
+        <main class="products-grid" id="gridProductos">
+
+            <!-- Producto 1 -->
+            <div class="product-card" data-category="Remeras" data-title="Remera manga corta blanca   ">
+                <div class="product-img">
+                    <span class="badge-tag">NUEVO</span>
+                    <img src="images/Remera mangas cortas blanca.jpeg" style="width: 100%; height: 100%; object-fit: cover;">
+                </div>
+                <div class="product-info">
+                    <span class="product-cat">Remeras</span>
+                    <h2 class="product-title">Remera blanca manga corta Eleboro</h2>
+                    <div class="product-size-text">Talle: <span>M</span></div>
+                    <div class="price-row">
+                        <span class="price-new">$25.000</span>
+                        <span class="price-old"></span>
+                    </div>
+                    <a href="https://wa.me/5493516681511?text=Hola%2C%20quisiera%20pedir%20la%20Remera%20blanca%20manga%20corta%20Eleboro%20en%20talle%20M" target="_blank" class="btn-whatsapp">
+                        💬 Pedir por WhatsApp
+                    </a>
+                </div>
+            </div>
+            <!-- Producto 2 -->
+            <div class="product-card" data-category="Pantalones" data-title="Pantalon negro">
+                <div class="product-img">
+                    <span class="badge-tag">NUEVO</span>
+                    <img src="images/pantalon negro.jpeg" style="width: 100%; height: 100%; object-fit: cover;">
+                </div>
+                <div class="product-info">
+                    <span class="product-cat">Pantalones</span>
+                    <h2 class="product-title">Pantalon Hawai negro</h2>
+                    <div class="product-size-text">Talle: <span>M</span></div>
+                    <div class="price-row">
+                        <span class="price-new">$54.000</span>
+                        <span class="price-old"></span>
+                    </div>
+                    <a href="https://wa.me/5493516681511?text=Hola%2C%20quisiera%20pedir%20el%20Pantalon%20negro%20Hawai%20en%20talle%20M" target="_blank" class="btn-whatsapp">
+                        💬 Pedir por WhatsApp
+                    </a>
+                </div>
+            </div>
+            <!-- Producto 3 -->
+            <div class="product-card" data-category="Accesorios" data-title="Cinturon Negro">
+                <div class="product-img">
+                    <span class="badge-tag">NUEVO</span>
+                    <img src="images/Cinturon negro.jpeg" style="width: 100%; height: 100%; object-fit: cover;">
+                </div>
+                <div class="product-info">
+                    <span class="product-cat">Accesorios</span>
+                    <h2 class="product-title">Cinto Corylus Negro</h2>
+                    <div class="product-size-text">Talle: <span>110</span></div>
+                    <div class="price-row">
+                        <span class="price-new">$17.000</span>
+                        <span class="price-old"></span>
+                    </div>
+                    <a href="https://wa.me/5493516681511?text=Hola%2C%20quisiera%20pedir%20el%20Cinturon%20negro%20manga%20Courlyus%20en%20talle%20110" target="_blank" class="btn-whatsapp">
+                        💬 Pedir por WhatsApp
+                    </a>
+                </div>
+            </div>
+            <!-- Producto 4 -->
+            <div class="product-card" data-category="Remeras" data-title="Remera manga corta verde">
+                <div class="product-img">
+                    <span class="badge-tag">NUEVO</span>
+                   <img src="images/Remera mangas cortas verde.jpeg" style="width: 100%; height: 100%; object-fit: cover;">
+                </div>
+                <div class="product-info">
+                    <span class="product-cat">Remeras</span>
+                    <h2 class="product-title">Remera Medellin verde manga corta</h2>
+                    <div class="product-size-text">Talle: <span>L</span></div>
+                    <div class="price-row">
+                        <span class="price-new">$27.400</span>
+                        <span class="price-old"></span>
+                    </div>
+                    <a href="https://wa.me/5493516681511?text=Hola%2C%20quisiera%20pedir%20la%20Remera%20verde%20manga%20corta%20Medellin%20en%20talle%20L" target="_blank" class="btn-whatsapp">
+                        💬 Pedir por WhatsApp
+                    </a>
+                </div>
+            </div>
+            <!-- Producto 5 -->
+            <div class="product-card" data-category="Pantalones" data-title="Jeans azul oscuro">
+                <div class="product-img">
+                    <span class="badge-tag">NUEVO</span>
+                    <img src="images/Jean azul claro.jpeg" style="width: 100%; height: 100%; object-fit: cover;">
+                </div>
+                <div class="product-info">
+                    <span class="product-cat">Pantalones</span>
+                    <h2 class="product-title">Jeans Abey azul marino</h2>
+                    <div class="product-size-text">Talle: <span>38</span></div>
+                    <div class="price-row">
+                        <span class="price-new">$55.000</span>
+                        <span class="price-old"></span>
+                    </div>
+                    <a href="https://wa.me/5493516681511?text=Hola%2C%20quisiera%20pedir%20el%20Jean%20azul%20marino%20Abey%20en%20talle%2038" target="_blank" class="btn-whatsapp">
+                        💬 Pedir por WhatsApp
+                    </a>
+                </div>
+            </div>
+            <!-- Producto 6 -->
+            <div class="product-card" data-category="Remeras" data-title="Blusa celeste">
+                <div class="product-img">
+                    <span class="badge-tag">NUEVO</span>
+                    <img src="images/musculosa gris-verde.jpeg" style="width: 100%; height: 100%; object-fit: cover;">
+                </div>
+                <div class="product-info">
+                    <span class="product-cat">Remeras</span>
+                    <h2 class="product-title">Blusa Esmeralda color celeste</h2>
+                     <div class="product-size-text">Talle: <span>U</span></div>
+                    <div class="price-row">
+                        <span class="price-new">$28.000</span>
+                        <span class="price-old"></span>
+                    </div>
+                    <a href="https://wa.me/5493516681511?text=Hola%2C%20quisiera%20pedir%20la%20musculosa%20celeste%20Esmeralda%20en%20talle%20U" target="_blank" class="btn-whatsapp">
+                        💬 Pedir por WhatsApp
+                    </a>
+                </div>
+            </div>
+            <!-- Producto 7 -->
+            <div class="product-card" data-category="Abrigos" data-title="Buzo negro">
+                <div class="product-img">
+                    <span class="badge-tag">NUEVO</span>
+                    <img src="images/Buzo negro con huellas.jpeg" style="width: 100%; height: 100%; object-fit: cover;">
+                </div>
+                <div class="product-info">
+                    <span class="product-cat">buzos</span>
+                    <h2 class="product-title">Buzo Borraja negro con huellitas</h2>
+                    <div class="product-size-text">Talle: <span>L</span></div>
+                    <div class="price-row">
+                        <span class="price-new">$55.000</span>
+                        <span class="price-old"></span>
+                    </div>
+                    <a href="https://wa.me/5493516681511?text=Hola%2C%20quisiera%20pedir%20el%20Buzo%20negro%20con%20huellitas%20Borraja%20en%20talle%20Ls" target="_blank" class="btn-whatsapp">
+                        💬 Pedir por WhatsApp
+                    </a>
+                </div>
+            </div>
+            <!-- Producto 8 -->
+            <div class="product-card" data-category="Remeras" data-title="Producto Innovador 8">
+                <div class="product-img">
+                    <span class="badge-tag">NUEVO</span>
+                    <img src="images/Musculosa blanca 2.jpeg" style="width: 100%; height: 100%; object-fit: cover;">
+                </div>
+                <div class="product-info">
+                    <span class="product-cat">Remeras</span>
+                    <h2 class="product-title">Musculosa Maria verde </h2>
+                     <div class="product-size-text">Talle: <span>U</span></div>
+                    <div class="price-row">
+                        <span class="price-new">$12.000</span>
+                        <span class="price-old"></span>
+                    </div>
+                    <a href="https://wa.me/5493516681511?text=Hola%2C%20quisiera%20pedir%20la%20Musculosa%20verde%20Maria%20en%20talle%20U" target="_blank" class="btn-whatsapp">
+                        💬 Pedir por WhatsApp
+                    </a>
+                </div>
+            </div>
+            <!-- Producto 9 -->
+            <div class="product-card" data-category="Pantalones" data-title="Producto Innovador 9">
+                 <div class="product-img">
+                    <span class="badge-tag">NUEVO</span>
+                    <img src="images/Jean azul claro.jpeg" style="width: 100%; height: 100%; object-fit: cover;">
+                </div>
+                <div class="product-info">
+                    <span class="product-cat">Pantalones</span>
+                    <h2 class="product-title">Jeans Hamburgo celeste claro</h2>
+                    <div class="product-size-text">Talle: <span>46</span></div>
+                    <div class="price-row">
+                        <span class="price-new">$56.000</span>
+                        <span class="price-old"></span>
+                    </div>
+                    <a href="https://wa.me/5493516681511?text=Hola%2C%20quisiera%20pedir%20el%20Jean%20Celeste%20claro%20Hamburgo%20en%20talle%2046" target="_blank" class="btn-whatsapp">
+                        💬 Pedir por WhatsApp
+                    </a>
+                </div>
+            </div>
+            <!-- Producto 10 -->
+            <div class="product-card" data-category="Accesorios" data-title="Producto Innovador 10">
+                <div class="product-img">
+                    <span class="badge-tag">NUEVO</span>
+                    <img src="images/pijama palta conjunto .jpeg" style="width: 100%; height: 100%; object-fit: cover;">
+                </div>
+                <div class="product-info">
+                    <span class="product-cat">Otros</span>
+                    <h2 class="product-title">Pijama San Diego negro paltas </h2>
+                     <div class="product-size-text">Talle: <span>S</span></div>
+                    <div class="price-row">
+                        <span class="price-new">$42.000</span>
+                        <span class="price-old"></span>
+                    </div>
+                    <a href="https://wa.me/5493516681511?text=Hola%2C%20quisiera%20pedir%20el%20Pijama%20negro%20San%20Diego%20en%20talle%20S" target="_blank" class="btn-whatsapp">
+                        💬 Pedir por WhatsApp
+                    </a>
+                </div>
+            </div>
+            <!-- Producto 11 -->
+            <div class="product-card" data-category="Remeras" data-title="Producto Innovador 11">
+                <div class="product-img">
+                    <span class="badge-tag">NUEVO</span>
+                    <img src="images/Remera mangas cortas negra.jpeg" style="width: 100%; height: 100%; object-fit: cover;">
+                </div>
+                <div class="product-info">
+                    <span class="product-cat">Remeras</span>
+                    <h2 class="product-title">Remera Loanda negra </h2>
+                     <div class="product-size-text">Talle: <span>S</span></div>
+                    <div class="price-row">
+                        <span class="price-new">$35.000</span>
+                        <span class="price-old"></span>
+                    </div>
+                    <a href="https://wa.me/5493516681511?text=Hola%2C%20quisiera%20pedir%20la%20Remera%20negra%20manga%20corta%20Loanda%20en%20talle%20S" target="_blank" class="btn-whatsapp">
+                        💬 Pedir por WhatsApp
+                    </a>
+                </div>
+            </div>
+            <!-- Producto 12 -->
+            <div class="product-card" data-category="Remeras" data-title="Producto Innovador 12">
+                <div class="product-img">
+                    <span class="badge-tag">NUEVO</span>
+                    <img src="images/musculosa blanca.jpeg" style="width: 100%; height: 100%; object-fit: cover;">
+                </div>
+                <div class="product-info">
+                    <span class="product-cat">Remeras</span>
+                    <h2 class="product-title">Musculosa Tabossi blanca </h2>
+                     <div class="product-size-text">Talle: <span>M</span></div>
+                    <div class="price-row">
+                        <span class="price-new">$35.000</span>
+                        <span class="price-old"></span>
+                    </div>
+                    <a href="https://wa.me/5493516681511?text=Hola%2C%20quisiera%20pedir%20la%20Musculosa%20blanca%20Tabossi%20en%20talle%20M" target="_blank" class="btn-whatsapp">
+                        💬 Pedir por WhatsApp
+                    </a>
+                </div>
+            </div>
+            <!-- Producto 13 -->
+            <div class="product-card" data-category="Remeras" data-title="Producto Innovador 13">
+                <div class="product-img">
+                    <span class="badge-tag">NUEVO</span>
+                    <img src="images/Musculosa azul.jpeg" style="width: 100%; height: 100%; object-fit: cover;">
+                </div>
+                <div class="product-info">
+                    <span class="product-cat">Remeras</span>
+                    <h2 class="product-title">Musculosa Tabossi celeste </h2>
+                     <div class="product-size-text">Talle: <span>L</span></div>
+                    <div class="price-row">
+                        <span class="price-new">$35.000</span>
+                        <span class="price-old"></span>
+                    </div>
+                    <a href="https://wa.me/5493516681511?text=Hola%2C%20quisiera%20pedir%20la%20Musculosa%20celeste%20Tabossi%20en%20talle%20L" target="_blank" class="btn-whatsapp">
+                        💬 Pedir por WhatsApp
+                    </a>
+                </div>
+            </div>
+            <!-- Producto 14 -->
+            <div class="product-card" data-category="Accesorios" data-title="Producto Innovador 14">
+                <div class="product-img">
+                    <span class="badge-tag">NUEVO</span>
+                    <img src="images/Cinturon negro con hevilla redonda.jpeg" style="width: 100%; height: 100%; object-fit: cover;">
+                </div>
+                <div class="product-info">
+                    <span class="product-cat">Accesorios</span>
+                    <h2 class="product-title">Cinto Fagus Negro</h2>
+                    <div class="product-size-text">Talle: <span>95</span></div>
+                    <div class="price-row">
+                        <span class="price-new">$16.000</span>
+                        <span class="price-old"></span>
+                    </div>
+                    <a href="https://wa.me/5493516681511?text=Hola%2C%20quisiera%20pedir%20el%20Cinturon%20negro%20Fagus%20en%20talle%2095" target="_blank" class="btn-whatsapp">
+                        💬 Pedir por WhatsApp
+                    </a>
+                </div>
+            </div>
+            <!-- Producto 15 -->
+            <div class="product-card" data-category="Accesorios" data-title="Producto Innovador 15">
+                <div class="product-img">
+                    <span class="badge-tag">NUEVO</span>
+                    <img src="images/Bolso con manchas marron.jpeg" style="width: 100%; height: 100%; object-fit: cover;">
+                </div>
+                <div class="product-info">
+                    <span class="product-cat">Accesorios</span>
+                    <h2 class="product-title">Cartera Georgia negra</h2>
+                    <div class="product-size-text">Talle: <span>U</span></div>
+                    <div class="price-row">
+                        <span class="price-new">$32.000</span>
+                        <span class="price-old"></span>
+                    </div>
+                    <a href="https://wa.me/5493516681511?text=Hola%2C%20quisiera%20pedir%20la%20Cartera%20negra%20con%20manchas%20Georgia%20en%20talle%20U" target="_blank" class="btn-whatsapp">
+                        💬 Pedir por WhatsApp
+                    </a>
+                </div>
+            </div>
+            <!-- Producto 16 -->
+            <div class="product-card" data-category="Remeras" data-title="Producto Innovador 16">
+                <div class="product-img">
+                    <span class="badge-tag">NUEVO</span>
+                    <img src="images/Vestido blanco.jpeg" style="width: 100%; height: 100%; object-fit: cover;">
+                </div>
+                <div class="product-info">
+                    <span class="product-cat">Remeras</span>
+                    <h2 class="product-title">Vestido Celina blanco </h2>
+                     <div class="product-size-text">Talle: <span>U</span></div>
+                    <div class="price-row">
+                        <span class="price-new">$30.000</span>
+                        <span class="price-old"></span>
+                    </div>
+                    <a href="https://wa.me/5493516681511?text=Hola%2C%20quisiera%20pedir%20el%20vestido%20blanco%20Celina%20en%20talle%20U" target="_blank" class="btn-whatsapp">
+                        💬 Pedir por WhatsApp
+                    </a>
+                </div>
+            </div>
+            <!-- Producto 17 -->
+            <div class="product-card" data-category="Accesorios" data-title="Producto Innovador 17">
+                <div class="product-img">
+                    <span class="badge-tag">NUEVO</span>
+                    <img src="images/Bolso con manchas beige.jpeg" style="width: 100%; height: 100%; object-fit: cover;">
+                </div>
+                <div class="product-info">
+                    <span class="product-cat">Accesorios</span>
+                    <h2 class="product-title">Cartera Georgia beige</h2>
+                    <div class="product-size-text">Talle: <span>U</span></div>
+                    <div class="price-row">
+                        <span class="price-new">$32.000</span>
+                        <span class="price-old"></span>
+                    </div>
+                    <a href="https://wa.me/5493516681511?text=Hola%2C%20quisiera%20pedir%20la%20cartera%20beige%20con%20manchas%20Georgia%20en%20talle%20U" target="_blank" class="btn-whatsapp">
+                        💬 Pedir por WhatsApp
+                    </a>
+                </div>
+            </div>
+            <!-- Producto 18 -->
+            <div class="product-card" data-category="Remeras" data-title="Producto Innovador 18">
+                <div class="product-img">
+                    <span class="badge-tag">NUEVO</span>
+                    <img src="images/Vestido de palntas.jpeg" style="width: 100%; height: 100%; object-fit: cover;">
+                </div>
+                <div class="product-info">
+                    <span class="product-cat">Remeras</span>
+                    <h2 class="product-title">Vestido Crespo crudo-rosa-verde </h2>
+                     <div class="product-size-text">Talle: <span>S</span></div>
+                    <div class="price-row">
+                        <span class="price-new">$29.000</span>
+                        <span class="price-old"></span>
+                    </div>
+                    <a href="https://wa.me/5493516681511?text=Hola%2C%20quisiera%20pedir%20el%20Vestido%20rosa%20y%20verde%20Crespo%20en%20talle%20S" target="_blank" class="btn-whatsapp">
+                        💬 Pedir por WhatsApp
+                    </a>
+                </div>
+            </div>
+            <!-- Producto 19 -->
+            <div class="product-card" data-category="Remeras" data-title="Producto Innovador 19">
+                <div class="product-img">
+                    <span class="badge-tag">NUEVO</span>
+                    <img src="images/Remera mangas largas blanca.jpeg" style="width: 100%; height: 100%; object-fit: cover;">
+                </div>
+                <div class="product-info">
+                    <span class="product-cat">Remeras</span>
+                    <h2 class="product-title">Remera manga larga Berna beige </h2>
+                     <div class="product-size-text">Talle: <span>M</span></div>
+                    <div class="price-row">
+                        <span class="price-new">$33.000</span>
+                        <span class="price-old"></span>
+                    </div>
+                    <a href="https://wa.me/5493516681511?text=Hola%2C%20quisiera%20pedir%20la%20Remera%20beige%20manga%20larga%20Berna%20en%20talle%20M" target="_blank" class="btn-whatsapp">
+                        💬 Pedir por WhatsApp
+                    </a>
+                </div>
+            </div>
+            <!-- Producto 20 -->
+            <div class="product-card" data-category="Remeras" data-title="Producto Innovador 20">
+                <div class="product-img">
+                    <span class="badge-tag">NUEVO</span>
+                    <img src="images/Remeras mangas largas negra.jpeg" style="width: 100%; height: 100%; object-fit: cover;">
+                </div>
+                <div class="product-info">
+                    <span class="product-cat">Remeras</span>
+                    <h2 class="product-title">Remera manga larga Poplar Beige </h2>
+                     <div class="product-size-text">Talle: <span>M</span></div>
+                    <div class="price-row">
+                        <span class="price-new">$26.000</span>
+                        <span class="price-old"></span>
+                    </div>
+                    <a href="https://wa.me/5493516681511?text=Hola%2C%20quisiera%20pedir%20la%20Remera%20beige%20manga%20larga%20Poplar%20en%20talle%20M" target="_blank" class="btn-whatsapp">
+                        💬 Pedir por WhatsApp
+                    </a>
+                </div>
+            </div>
+            <!-- Producto 21 -->
+            <div class="product-card" data-category="Hogar" data-title="Producto Innovador 21">
+                <div class="product-img">
+                    <span class="badge-tag">NUEVO</span>
+                    <img src="images/Remera mangas largas blanco y negro.jpeg" style="width: 100%; height: 100%; object-fit: cover;">
+                </div>
+                <div class="product-info">
+                    <span class="product-cat">Remeras</span>
+                    <h2 class="product-title">Remera manga larga Onagra a rayas gris </h2>
+                     <div class="product-size-text">Talle: <span>L</span></div>
+                    <div class="price-row">
+                        <span class="price-new">$21.000</span>
+                        <span class="price-old"></span>
+                    </div>
+                    <a href="https://wa.me/5493516681511?text=Hola%2C%20quisiera%20pedir%20la%20Remera%20gris%20manga%20larga%20Onagra%20en%20talle%20L" target="_blank" class="btn-whatsapp">
+                        💬 Pedir por WhatsApp
+                    </a>
+                </div>
+            </div>
+            <!-- Producto 22 -->
+            <div class="product-card" data-category="Belleza" data-title="Producto Innovador 22">
+                <div class="product-img">
+                    <span class="badge-tag">NUEVO</span>
+                    <img src="images/Remera Mangas largas marron.jpeg" style="width: 100%; height: 100%; object-fit: cover;">
+                </div>
+                <div class="product-info">
+                    <span class="product-cat">Remeras</span>
+                    <h2 class="product-title">Remera manga larga Glicinia verde oliva </h2>
+                     <div class="product-size-text">Talle: <span>M</span></div>
+                    <div class="price-row">
+                        <span class="price-new">$27.400</span>
+                        <span class="price-old"></span>
+                    </div>
+                    <a href="https://wa.me/5493516681511?text=Hola%2C%20quisiera%20pedir%20la%20Remera%20verde%20manga%20larga%20Glicinia%20en%20talle%20M" target="_blank" class="btn-whatsapp">
+                        💬 Pedir por WhatsApp
+                    </a>
+                </div>
+            </div>
+
+            <!-- PRODUCTOS NO PUBLICADOS (DESDE EL 23 HASTA EL 100)
+            <!-- Producto 23 -->
+            <div class="product-card" data-category="Deportes" data-title="Producto Innovador 23">
+                <div class="product-img">
+                    <span class="badge-tag">OFERTA</span>
+                    [Foto Producto 23]
+                </div>
+                <div class="product-info">
+                    <span class="product-cat">Deportes</span>
+                    <h2 class="product-title">Producto Innovador 23 - Solución Inteligente</h2>
+                    <div class="price-row">
+                        <span class="price-new">$34.99</span>
+                        <span class="price-old">$69.98</span>
+                    </div>
+                    <a href="https://wa.me/5491123456789?text=Hola%20MegaTienda%20Drop%2C%20estoy%20interesado%20en%20el%20Producto%2023%20%28Deportes%29%20por%20%2434.99.%20Deseo%20solicitar%20el%20Pago%20Contra%20Entrega." target="_blank" class="btn-whatsapp">
+                        💬 Pedir por WhatsApp
+                    </a>
+                </div>
+            </div>
+            <!-- Producto 24 -->
+            <!--<div class="product-card" data-category="Remeras" data-title="Producto Innovador 24">
+                <div class="product-img">
+                    <span class="badge-tag">OFERTA</span>
+                    [Foto Producto 24]
+                </div>
+                <div class="product-info">
+                    <span class="product-cat">Remeras</span>
+                    <h2 class="product-title">Producto Innovador 24 - Solución Inteligente</h2>
+                    <div class="price-row">
+                        <span class="price-new">$45.0</span>
+                        <span class="price-old">$90.0</span>
+                    </div>
+                    <a href="https://wa.me/5491123456789?text=Hola%20MegaTienda%20Drop%2C%20estoy%20interesado%20en%20el%20Producto%2024%20%28Tecnolog%C3%ADa%29%20por%20%2445.0.%20Deseo%20solicitar%20el%20Pago%20Contra%20Entrega." target="_blank" class="btn-whatsapp">
+                        💬 Pedir por WhatsApp
+                    </a>
+                </div>
+            </div>
+            <!-- Producto 25 -->
+            <div class="product-card" data-category="Hogar" data-title="Producto Innovador 25">
+                <div class="product-img">
+                    <span class="badge-tag">OFERTA</span>
+                    [Foto Producto 25]
+                </div>
+                <div class="product-info">
+                    <span class="product-cat">Hogar</span>
+                    <h2 class="product-title">Producto Innovador 25 - Solución Inteligente</h2>
+                    <div class="price-row">
+                        <span class="price-new">$9.99</span>
+                        <span class="price-old">$19.98</span>
+                    </div>
+                    <a href="https://wa.me/5491123456789?text=Hola%20MegaTienda%20Drop%2C%20estoy%20interesado%20en%20el%20Producto%2025%20%28Hogar%29%20por%20%249.99.%20Deseo%20solicitar%20el%20Pago%20Contra%20Entrega." target="_blank" class="btn-whatsapp">
+                        💬 Pedir por WhatsApp
+                    </a>
+                </div>
+            </div>
+            <!-- Producto 26 -->
+            <div class="product-card" data-category="Belleza" data-title="Producto Innovador 26">
+                <div class="product-img">
+                    <span class="badge-tag">OFERTA</span>
+                    [Foto Producto 26]
+                </div>
+                <div class="product-info">
+                    <span class="product-cat">Belleza</span>
+                    <h2 class="product-title">Producto Innovador 26 - Solución Inteligente</h2>
+                    <div class="price-row">
+                        <span class="price-new">$29.99</span>
+                        <span class="price-old">$59.98</span>
+                    </div>
+                    <a href="https://wa.me/5491123456789?text=Hola%20MegaTienda%20Drop%2C%20estoy%20interesado%20en%20el%20Producto%2026%20%28Belleza%29%20por%20%2429.99.%20Deseo%20solicitar%20el%20Pago%20Contra%20Entrega." target="_blank" class="btn-whatsapp">
+                        💬 Pedir por WhatsApp
+                    </a>
+                </div>
+            </div>
+            <!-- Producto 27 -->
+            <div class="product-card" data-category="Deportes" data-title="Producto Innovador 27">
+                <div class="product-img">
+                    <span class="badge-tag">OFERTA</span>
+                    [Foto Producto 27]
+                </div>
+                <div class="product-info">
+                    <span class="product-cat">Deportes</span>
+                    <h2 class="product-title">Producto Innovador 27 - Solución Inteligente</h2>
+                    <div class="price-row">
+                        <span class="price-new">$39.99</span>
+                        <span class="price-old">$79.98</span>
+                    </div>
+                    <a href="https://wa.me/5491123456789?text=Hola%20MegaTienda%20Drop%2C%20estoy%20interesado%20en%20el%20Producto%2027%20%28Deportes%29%20por%20%2439.99.%20Deseo%20solicitar%20el%20Pago%20Contra%20Entrega." target="_blank" class="btn-whatsapp">
+                        💬 Pedir por WhatsApp
+                    </a>
+                </div>
+            </div>
+            <!-- Producto 28 -->
+            <!--<div class="product-card" data-category="Remeras" data-title="Producto Innovador 28">
+                <div class="product-img">
+                    <span class="badge-tag">OFERTA</span>
+                    [Foto Producto 28]
+                </div>
+                <div class="product-info">
+                    <span class="product-cat">Remeras</span>
+                    <h2 class="product-title">Producto Innovador 28 - Solución Inteligente</h2>
+                    <div class="price-row">
+                        <span class="price-new">$49.99</span>
+                        <span class="price-old">$99.98</span>
+                    </div>
+                    <a href="https://wa.me/5491123456789?text=Hola%20MegaTienda%20Drop%2C%20estoy%20interesado%20en%20el%20Producto%2028%20%28Tecnolog%C3%ADa%29%20por%20%2449.99.%20Deseo%20solicitar%20el%20Pago%20Contra%20Entrega." target="_blank" class="btn-whatsapp">
+                        💬 Pedir por WhatsApp
+                    </a>
+                </div>
+            </div>
+            <!-- Producto 29 -->
+            <div class="product-card" data-category="Hogar" data-title="Producto Innovador 29">
+                <div class="product-img">
+                    <span class="badge-tag">OFERTA</span>
+                    [Foto Producto 29]
+                </div>
+                <div class="product-info">
+                    <span class="product-cat">Hogar</span>
+                    <h2 class="product-title">Producto Innovador 29 - Solución Inteligente</h2>
+                    <div class="price-row">
+                        <span class="price-new">$12.5</span>
+                        <span class="price-old">$25.0</span>
+                    </div>
+                    <a href="https://wa.me/5491123456789?text=Hola%20MegaTienda%20Drop%2C%20estoy%20interesado%20en%20el%20Producto%2029%20%28Hogar%29%20por%20%2412.5.%20Deseo%20solicitar%20el%20Pago%20Contra%20Entrega." target="_blank" class="btn-whatsapp">
+                        💬 Pedir por WhatsApp
+                    </a>
+                </div>
+            </div>
+            <!-- Producto 30 -->
+            <div class="product-card" data-category="Belleza" data-title="Producto Innovador 30">
+                <div class="product-img">
+                    <span class="badge-tag">OFERTA</span>
+                    [Foto Producto 30]
+                </div>
+                <div class="product-info">
+                    <span class="product-cat">Belleza</span>
+                    <h2 class="product-title">Producto Innovador 30 - Solución Inteligente</h2>
+                    <div class="price-row">
+                        <span class="price-new">$25.99</span>
+                        <span class="price-old">$51.98</span>
+                    </div>
+                    <a href="https://wa.me/5491123456789?text=Hola%20MegaTienda%20Drop%2C%20estoy%20interesado%20en%20el%20Producto%2030%20%28Belleza%29%20por%20%2425.99.%20Deseo%20solicitar%20el%20Pago%20Contra%20Entrega." target="_blank" class="btn-whatsapp">
+                        💬 Pedir por WhatsApp
+                    </a>
+                </div>
+            </div>
+            <!-- Producto 31 -->
+            <div class="product-card" data-category="Deportes" data-title="Producto Innovador 31">
+                <div class="product-img">
+                    <span class="badge-tag">OFERTA</span>
+                    [Foto Producto 31]
+                </div>
+                <div class="product-info">
+                    <span class="product-cat">Deportes</span>
+                    <h2 class="product-title">Producto Innovador 31 - Solución Inteligente</h2>
+                    <div class="price-row">
+                        <span class="price-new">$19.99</span>
+                        <span class="price-old">$39.98</span>
+                    </div>
+                    <a href="https://wa.me/5491123456789?text=Hola%20MegaTienda%20Drop%2C%20estoy%20interesado%20en%20el%20Producto%2031%20%28Deportes%29%20por%20%2419.99.%20Deseo%20solicitar%20el%20Pago%20Contra%20Entrega." target="_blank" class="btn-whatsapp">
+                        💬 Pedir por WhatsApp
+                    </a>
+                </div>
+            </div>
+            <!-- Producto 32 -->
+            <div class="product-card" data-category="Tecnología" data-title="Producto Innovador 32">
+                <div class="product-img">
+                    <span class="badge-tag">OFERTA</span>
+                    [Foto Producto 32]
+                </div>
+                <div class="product-info">
+                    <span class="product-cat">Tecnología</span>
+                    <h2 class="product-title">Producto Innovador 32 - Solución Inteligente</h2>
+                    <div class="price-row">
+                        <span class="price-new">$14.99</span>
+                        <span class="price-old">$29.98</span>
+                    </div>
+                    <a href="https://wa.me/5491123456789?text=Hola%20MegaTienda%20Drop%2C%20estoy%20interesado%20en%20el%20Producto%2032%20%28Tecnolog%C3%ADa%29%20por%20%2414.99.%20Deseo%20solicitar%20el%20Pago%20Contra%20Entrega." target="_blank" class="btn-whatsapp">
+                        💬 Pedir por WhatsApp
+                    </a>
+                </div>
+            </div>
+            <!-- Producto 33 -->
+            <div class="product-card" data-category="Hogar" data-title="Producto Innovador 33">
+                <div class="product-img">
+                    <span class="badge-tag">OFERTA</span>
+                    [Foto Producto 33]
+                </div>
+                <div class="product-info">
+                    <span class="product-cat">Hogar</span>
+                    <h2 class="product-title">Producto Innovador 33 - Solución Inteligente</h2>
+                    <div class="price-row">
+                        <span class="price-new">$34.99</span>
+                        <span class="price-old">$69.98</span>
+                    </div>
+                    <a href="https://wa.me/5491123456789?text=Hola%20MegaTienda%20Drop%2C%20estoy%20interesado%20en%20el%20Producto%2033%20%28Hogar%29%20por%20%2434.99.%20Deseo%20solicitar%20el%20Pago%20Contra%20Entrega." target="_blank" class="btn-whatsapp">
+                        💬 Pedir por WhatsApp
+                    </a>
+                </div>
+            </div>
+            <!-- Producto 34 -->
+            <div class="product-card" data-category="Belleza" data-title="Producto Innovador 34">
+                <div class="product-img">
+                    <span class="badge-tag">OFERTA</span>
+                    [Foto Producto 34]
+                </div>
+                <div class="product-info">
+                    <span class="product-cat">Belleza</span>
+                    <h2 class="product-title">Producto Innovador 34 - Solución Inteligente</h2>
+                    <div class="price-row">
+                        <span class="price-new">$45.0</span>
+                        <span class="price-old">$90.0</span>
+                    </div>
+                    <a href="https://wa.me/5491123456789?text=Hola%20MegaTienda%20Drop%2C%20estoy%20interesado%20en%20el%20Producto%2034%20%28Belleza%29%20por%20%2445.0.%20Deseo%20solicitar%20el%20Pago%20Contra%20Entrega." target="_blank" class="btn-whatsapp">
+                        💬 Pedir por WhatsApp
+                    </a>
+                </div>
+            </div>
+            <!-- Producto 35 -->
+            <div class="product-card" data-category="Deportes" data-title="Producto Innovador 35">
+                <div class="product-img">
+                    <span class="badge-tag">OFERTA</span>
+                    [Foto Producto 35]
+                </div>
+                <div class="product-info">
+                    <span class="product-cat">Deportes</span>
+                    <h2 class="product-title">Producto Innovador 35 - Solución Inteligente</h2>
+                    <div class="price-row">
+                        <span class="price-new">$9.99</span>
+                        <span class="price-old">$19.98</span>
+                    </div>
+                    <a href="https://wa.me/5491123456789?text=Hola%20MegaTienda%20Drop%2C%20estoy%20interesado%20en%20el%20Producto%2035%20%28Deportes%29%20por%20%249.99.%20Deseo%20solicitar%20el%20Pago%20Contra%20Entrega." target="_blank" class="btn-whatsapp">
+                        💬 Pedir por WhatsApp
+                    </a>
+                </div>
+            </div>
+            <!-- Producto 36 -->
+            <div class="product-card" data-category="Tecnología" data-title="Producto Innovador 36">
+                <div class="product-img">
+                    <span class="badge-tag">OFERTA</span>
+                    [Foto Producto 36]
+                </div>
+                <div class="product-info">
+                    <span class="product-cat">Tecnología</span>
+                    <h2 class="product-title">Producto Innovador 36 - Solución Inteligente</h2>
+                    <div class="price-row">
+                        <span class="price-new">$29.99</span>
+                        <span class="price-old">$59.98</span>
+                    </div>
+                    <a href="https://wa.me/5491123456789?text=Hola%20MegaTienda%20Drop%2C%20estoy%20interesado%20en%20el%20Producto%2036%20%28Tecnolog%C3%ADa%29%20por%20%2429.99.%20Deseo%20solicitar%20el%20Pago%20Contra%20Entrega." target="_blank" class="btn-whatsapp">
+                        💬 Pedir por WhatsApp
+                    </a>
+                </div>
+            </div>
+            <!-- Producto 37 -->
+            <div class="product-card" data-category="Hogar" data-title="Producto Innovador 37">
+                <div class="product-img">
+                    <span class="badge-tag">OFERTA</span>
+                    [Foto Producto 37]
+                </div>
+                <div class="product-info">
+                    <span class="product-cat">Hogar</span>
+                    <h2 class="product-title">Producto Innovador 37 - Solución Inteligente</h2>
+                    <div class="price-row">
+                        <span class="price-new">$39.99</span>
+                        <span class="price-old">$79.98</span>
+                    </div>
+                    <a href="https://wa.me/5491123456789?text=Hola%20MegaTienda%20Drop%2C%20estoy%20interesado%20en%20el%20Producto%2037%20%28Hogar%29%20por%20%2439.99.%20Deseo%20solicitar%20el%20Pago%20Contra%20Entrega." target="_blank" class="btn-whatsapp">
+                        💬 Pedir por WhatsApp
+                    </a>
+                </div>
+            </div>
+            <!-- Producto 38 -->
+            <div class="product-card" data-category="Belleza" data-title="Producto Innovador 38">
+                <div class="product-img">
+                    <span class="badge-tag">OFERTA</span>
+                    [Foto Producto 38]
+                </div>
+                <div class="product-info">
+                    <span class="product-cat">Belleza</span>
+                    <h2 class="product-title">Producto Innovador 38 - Solución Inteligente</h2>
+                    <div class="price-row">
+                        <span class="price-new">$49.99</span>
+                        <span class="price-old">$99.98</span>
+                    </div>
+                    <a href="https://wa.me/5491123456789?text=Hola%20MegaTienda%20Drop%2C%20estoy%20interesado%20en%20el%20Producto%2038%20%28Belleza%29%20por%20%2449.99.%20Deseo%20solicitar%20el%20Pago%20Contra%20Entrega." target="_blank" class="btn-whatsapp">
+                        💬 Pedir por WhatsApp
+                    </a>
+                </div>
+            </div>
+            <!-- Producto 39 -->
+            <div class="product-card" data-category="Deportes" data-title="Producto Innovador 39">
+                <div class="product-img">
+                    <span class="badge-tag">OFERTA</span>
+                    [Foto Producto 39]
+                </div>
+                <div class="product-info">
+                    <span class="product-cat">Deportes</span>
+                    <h2 class="product-title">Producto Innovador 39 - Solución Inteligente</h2>
+                    <div class="price-row">
+                        <span class="price-new">$12.5</span>
+                        <span class="price-old">$25.0</span>
+                    </div>
+                    <a href="https://wa.me/5491123456789?text=Hola%20MegaTienda%20Drop%2C%20estoy%20interesado%20en%20el%20Producto%2039%20%28Deportes%29%20por%20%2412.5.%20Deseo%20solicitar%20el%20Pago%20Contra%20Entrega." target="_blank" class="btn-whatsapp">
+                        💬 Pedir por WhatsApp
+                    </a>
+                </div>
+            </div>
+            <!-- Producto 40 -->
+            <div class="product-card" data-category="Tecnología" data-title="Producto Innovador 40">
+                <div class="product-img">
+                    <span class="badge-tag">OFERTA</span>
+                    [Foto Producto 40]
+                </div>
+                <div class="product-info">
+                    <span class="product-cat">Tecnología</span>
+                    <h2 class="product-title">Producto Innovador 40 - Solución Inteligente</h2>
+                    <div class="price-row">
+                        <span class="price-new">$25.99</span>
+                        <span class="price-old">$51.98</span>
+                    </div>
+                    <a href="https://wa.me/5491123456789?text=Hola%20MegaTienda%20Drop%2C%20estoy%20interesado%20en%20el%20Producto%2040%20%28Tecnolog%C3%ADa%29%20por%20%2425.99.%20Deseo%20solicitar%20el%20Pago%20Contra%20Entrega." target="_blank" class="btn-whatsapp">
+                        💬 Pedir por WhatsApp
+                    </a>
+                </div>
+            </div>
+            <!-- Producto 41 -->
+            <div class="product-card" data-category="Hogar" data-title="Producto Innovador 41">
+                <div class="product-img">
+                    <span class="badge-tag">OFERTA</span>
+                    [Foto Producto 41]
+                </div>
+                <div class="product-info">
+                    <span class="product-cat">Hogar</span>
+                    <h2 class="product-title">Producto Innovador 41 - Solución Inteligente</h2>
+                    <div class="price-row">
+                        <span class="price-new">$19.99</span>
+                        <span class="price-old">$39.98</span>
+                    </div>
+                    <a href="https://wa.me/5491123456789?text=Hola%20MegaTienda%20Drop%2C%20estoy%20interesado%20en%20el%20Producto%2041%20%28Hogar%29%20por%20%2419.99.%20Deseo%20solicitar%20el%20Pago%20Contra%20Entrega." target="_blank" class="btn-whatsapp">
+                        💬 Pedir por WhatsApp
+                    </a>
+                </div>
+            </div>
+            <!-- Producto 42 -->
+            <div class="product-card" data-category="Belleza" data-title="Producto Innovador 42">
+                <div class="product-img">
+                    <span class="badge-tag">OFERTA</span>
+                    [Foto Producto 42]
+                </div>
+                <div class="product-info">
+                    <span class="product-cat">Belleza</span>
+                    <h2 class="product-title">Producto Innovador 42 - Solución Inteligente</h2>
+                    <div class="price-row">
+                        <span class="price-new">$14.99</span>
+                        <span class="price-old">$29.98</span>
+                    </div>
+                    <a href="https://wa.me/5491123456789?text=Hola%20MegaTienda%20Drop%2C%20estoy%20interesado%20en%20el%20Producto%2042%20%28Belleza%29%20por%20%2414.99.%20Deseo%20solicitar%20el%20Pago%20Contra%20Entrega." target="_blank" class="btn-whatsapp">
+                        💬 Pedir por WhatsApp
+                    </a>
+                </div>
+            </div>
+            <!-- Producto 43 -->
+            <div class="product-card" data-category="Deportes" data-title="Producto Innovador 43">
+                <div class="product-img">
+                    <span class="badge-tag">OFERTA</span>
+                    [Foto Producto 43]
+                </div>
+                <div class="product-info">
+                    <span class="product-cat">Deportes</span>
+                    <h2 class="product-title">Producto Innovador 43 - Solución Inteligente</h2>
+                    <div class="price-row">
+                        <span class="price-new">$34.99</span>
+                        <span class="price-old">$69.98</span>
+                    </div>
+                    <a href="https://wa.me/5491123456789?text=Hola%20MegaTienda%20Drop%2C%20estoy%20interesado%20en%20el%20Producto%2043%20%28Deportes%29%20por%20%2434.99.%20Deseo%20solicitar%20el%20Pago%20Contra%20Entrega." target="_blank" class="btn-whatsapp">
+                        💬 Pedir por WhatsApp
+                    </a>
+                </div>
+            </div>
+            <!-- Producto 44 -->
+            <div class="product-card" data-category="Tecnología" data-title="Producto Innovador 44">
+                <div class="product-img">
+                    <span class="badge-tag">OFERTA</span>
+                    [Foto Producto 44]
+                </div>
+                <div class="product-info">
+                    <span class="product-cat">Tecnología</span>
+                    <h2 class="product-title">Producto Innovador 44 - Solución Inteligente</h2>
+                    <div class="price-row">
+                        <span class="price-new">$45.0</span>
+                        <span class="price-old">$90.0</span>
+                    </div>
+                    <a href="https://wa.me/5491123456789?text=Hola%20MegaTienda%20Drop%2C%20estoy%20interesado%20en%20el%20Producto%2044%20%28Tecnolog%C3%ADa%29%20por%20%2445.0.%20Deseo%20solicitar%20el%20Pago%20Contra%20Entrega." target="_blank" class="btn-whatsapp">
+                        💬 Pedir por WhatsApp
+                    </a>
+                </div>
+            </div>
+            <!-- Producto 45 -->
+            <div class="product-card" data-category="Hogar" data-title="Producto Innovador 45">
+                <div class="product-img">
+                    <span class="badge-tag">OFERTA</span>
+                    [Foto Producto 45]
+                </div>
+                <div class="product-info">
+                    <span class="product-cat">Hogar</span>
+                    <h2 class="product-title">Producto Innovador 45 - Solución Inteligente</h2>
+                    <div class="price-row">
+                        <span class="price-new">$9.99</span>
+                        <span class="price-old">$19.98</span>
+                    </div>
+                    <a href="https://wa.me/5491123456789?text=Hola%20MegaTienda%20Drop%2C%20estoy%20interesado%20en%20el%20Producto%2045%20%28Hogar%29%20por%20%249.99.%20Deseo%20solicitar%20el%20Pago%20Contra%20Entrega." target="_blank" class="btn-whatsapp">
+                        💬 Pedir por WhatsApp
+                    </a>
+                </div>
+            </div>
+            <!-- Producto 46 -->
+            <div class="product-card" data-category="Belleza" data-title="Producto Innovador 46">
+                <div class="product-img">
+                    <span class="badge-tag">OFERTA</span>
+                    [Foto Producto 46]
+                </div>
+                <div class="product-info">
+                    <span class="product-cat">Belleza</span>
+                    <h2 class="product-title">Producto Innovador 46 - Solución Inteligente</h2>
+                    <div class="price-row">
+                        <span class="price-new">$29.99</span>
+                        <span class="price-old">$59.98</span>
+                    </div>
+                    <a href="https://wa.me/5491123456789?text=Hola%20MegaTienda%20Drop%2C%20estoy%20interesado%20en%20el%20Producto%2046%20%28Belleza%29%20por%20%2429.99.%20Deseo%20solicitar%20el%20Pago%20Contra%20Entrega." target="_blank" class="btn-whatsapp">
+                        💬 Pedir por WhatsApp
+                    </a>
+                </div>
+            </div>
+            <!-- Producto 47 -->
+            <div class="product-card" data-category="Deportes" data-title="Producto Innovador 47">
+                <div class="product-img">
+                    <span class="badge-tag">OFERTA</span>
+                    [Foto Producto 47]
+                </div>
+                <div class="product-info">
+                    <span class="product-cat">Deportes</span>
+                    <h2 class="product-title">Producto Innovador 47 - Solución Inteligente</h2>
+                    <div class="price-row">
+                        <span class="price-new">$39.99</span>
+                        <span class="price-old">$79.98</span>
+                    </div>
+                    <a href="https://wa.me/5491123456789?text=Hola%20MegaTienda%20Drop%2C%20estoy%20interesado%20en%20el%20Producto%2047%20%28Deportes%29%20por%20%2439.99.%20Deseo%20solicitar%20el%20Pago%20Contra%20Entrega." target="_blank" class="btn-whatsapp">
+                        💬 Pedir por WhatsApp
+                    </a>
+                </div>
+            </div>
+            <!-- Producto 48 -->
+            <div class="product-card" data-category="Tecnología" data-title="Producto Innovador 48">
+                <div class="product-img">
+                    <span class="badge-tag">OFERTA</span>
+                    [Foto Producto 48]
+                </div>
+                <div class="product-info">
+                    <span class="product-cat">Tecnología</span>
+                    <h2 class="product-title">Producto Innovador 48 - Solución Inteligente</h2>
+                    <div class="price-row">
+                        <span class="price-new">$49.99</span>
+                        <span class="price-old">$99.98</span>
+                    </div>
+                    <a href="https://wa.me/5491123456789?text=Hola%20MegaTienda%20Drop%2C%20estoy%20interesado%20en%20el%20Producto%2048%20%28Tecnolog%C3%ADa%29%20por%20%2449.99.%20Deseo%20solicitar%20el%20Pago%20Contra%20Entrega." target="_blank" class="btn-whatsapp">
+                        💬 Pedir por WhatsApp
+                    </a>
+                </div>
+            </div>
+            <!-- Producto 49 -->
+            <div class="product-card" data-category="Hogar" data-title="Producto Innovador 49">
+                <div class="product-img">
+                    <span class="badge-tag">OFERTA</span>
+                    [Foto Producto 49]
+                </div>
+                <div class="product-info">
+                    <span class="product-cat">Hogar</span>
+                    <h2 class="product-title">Producto Innovador 49 - Solución Inteligente</h2>
+                    <div class="price-row">
+                        <span class="price-new">$12.5</span>
+                        <span class="price-old">$25.0</span>
+                    </div>
+                    <a href="https://wa.me/5491123456789?text=Hola%20MegaTienda%20Drop%2C%20estoy%20interesado%20en%20el%20Producto%2049%20%28Hogar%29%20por%20%2412.5.%20Deseo%20solicitar%20el%20Pago%20Contra%20Entrega." target="_blank" class="btn-whatsapp">
+                        💬 Pedir por WhatsApp
+                    </a>
+                </div>
+            </div>
+            <!-- Producto 50 -->
+            <div class="product-card" data-category="Belleza" data-title="Producto Innovador 50">
+                <div class="product-img">
+                    <span class="badge-tag">OFERTA</span>
+                    [Foto Producto 50]
+                </div>
+                <div class="product-info">
+                    <span class="product-cat">Belleza</span>
+                    <h2 class="product-title">Producto Innovador 50 - Solución Inteligente</h2>
+                    <div class="price-row">
+                        <span class="price-new">$25.99</span>
+                        <span class="price-old">$51.98</span>
+                    </div>
+                    <a href="https://wa.me/5491123456789?text=Hola%20MegaTienda%20Drop%2C%20estoy%20interesado%20en%20el%20Producto%2050%20%28Belleza%29%20por%20%2425.99.%20Deseo%20solicitar%20el%20Pago%20Contra%20Entrega." target="_blank" class="btn-whatsapp">
+                        💬 Pedir por WhatsApp
+                    </a>
+                </div>
+            </div>
+            <!-- Producto 51 -->
+            <div class="product-card" data-category="Deportes" data-title="Producto Innovador 51">
+                <div class="product-img">
+                    <span class="badge-tag">OFERTA</span>
+                    [Foto Producto 51]
+                </div>
+                <div class="product-info">
+                    <span class="product-cat">Deportes</span>
+                    <h2 class="product-title">Producto Innovador 51 - Solución Inteligente</h2>
+                    <div class="price-row">
+                        <span class="price-new">$19.99</span>
+                        <span class="price-old">$39.98</span>
+                    </div>
+                    <a href="https://wa.me/5491123456789?text=Hola%20MegaTienda%20Drop%2C%20estoy%20interesado%20en%20el%20Producto%2051%20%28Deportes%29%20por%20%2419.99.%20Deseo%20solicitar%20el%20Pago%20Contra%20Entrega." target="_blank" class="btn-whatsapp">
+                        💬 Pedir por WhatsApp
+                    </a>
+                </div>
+            </div>
+            <!-- Producto 52 -->
+            <div class="product-card" data-category="Tecnología" data-title="Producto Innovador 52">
+                <div class="product-img">
+                    <span class="badge-tag">OFERTA</span>
+                    [Foto Producto 52]
+                </div>
+                <div class="product-info">
+                    <span class="product-cat">Tecnología</span>
+                    <h2 class="product-title">Producto Innovador 52 - Solución Inteligente</h2>
+                    <div class="price-row">
+                        <span class="price-new">$14.99</span>
+                        <span class="price-old">$29.98</span>
+                    </div>
+                    <a href="https://wa.me/5491123456789?text=Hola%20MegaTienda%20Drop%2C%20estoy%20interesado%20en%20el%20Producto%2052%20%28Tecnolog%C3%ADa%29%20por%20%2414.99.%20Deseo%20solicitar%20el%20Pago%20Contra%20Entrega." target="_blank" class="btn-whatsapp">
+                        💬 Pedir por WhatsApp
+                    </a>
+                </div>
+            </div>
+            <!-- Producto 53 -->
+            <div class="product-card" data-category="Hogar" data-title="Producto Innovador 53">
+                <div class="product-img">
+                    <span class="badge-tag">OFERTA</span>
+                    [Foto Producto 53]
+                </div>
+                <div class="product-info">
+                    <span class="product-cat">Hogar</span>
+                    <h2 class="product-title">Producto Innovador 53 - Solución Inteligente</h2>
+                    <div class="price-row">
+                        <span class="price-new">$34.99</span>
+                        <span class="price-old">$69.98</span>
+                    </div>
+                    <a href="https://wa.me/5491123456789?text=Hola%20MegaTienda%20Drop%2C%20estoy%20interesado%20en%20el%20Producto%2053%20%28Hogar%29%20por%20%2434.99.%20Deseo%20solicitar%20el%20Pago%20Contra%20Entrega." target="_blank" class="btn-whatsapp">
+                        💬 Pedir por WhatsApp
+                    </a>
+                </div>
+            </div>
+            <!-- Producto 54 -->
+            <div class="product-card" data-category="Belleza" data-title="Producto Innovador 54">
+                <div class="product-img">
+                    <span class="badge-tag">OFERTA</span>
+                    [Foto Producto 54]
+                </div>
+                <div class="product-info">
+                    <span class="product-cat">Belleza</span>
+                    <h2 class="product-title">Producto Innovador 54 - Solución Inteligente</h2>
+                    <div class="price-row">
+                        <span class="price-new">$45.0</span>
+                        <span class="price-old">$90.0</span>
+                    </div>
+                    <a href="https://wa.me/5491123456789?text=Hola%20MegaTienda%20Drop%2C%20estoy%20interesado%20en%20el%20Producto%2054%20%28Belleza%29%20por%20%2445.0.%20Deseo%20solicitar%20el%20Pago%20Contra%20Entrega." target="_blank" class="btn-whatsapp">
+                        💬 Pedir por WhatsApp
+                    </a>
+                </div>
+            </div>
+            <!-- Producto 55 -->
+            <div class="product-card" data-category="Deportes" data-title="Producto Innovador 55">
+                <div class="product-img">
+                    <span class="badge-tag">OFERTA</span>
+                    [Foto Producto 55]
+                </div>
+                <div class="product-info">
+                    <span class="product-cat">Deportes</span>
+                    <h2 class="product-title">Producto Innovador 55 - Solución Inteligente</h2>
+                    <div class="price-row">
+                        <span class="price-new">$9.99</span>
+                        <span class="price-old">$19.98</span>
+                    </div>
+                    <a href="https://wa.me/5491123456789?text=Hola%20MegaTienda%20Drop%2C%20estoy%20interesado%20en%20el%20Producto%2055%20%28Deportes%29%20por%20%249.99.%20Deseo%20solicitar%20el%20Pago%20Contra%20Entrega." target="_blank" class="btn-whatsapp">
+                        💬 Pedir por WhatsApp
+                    </a>
+                </div>
+            </div>
+            <!-- Producto 56 -->
+            <div class="product-card" data-category="Tecnología" data-title="Producto Innovador 56">
+                <div class="product-img">
+                    <span class="badge-tag">OFERTA</span>
+                    [Foto Producto 56]
+                </div>
+                <div class="product-info">
+                    <span class="product-cat">Tecnología</span>
+                    <h2 class="product-title">Producto Innovador 56 - Solución Inteligente</h2>
+                    <div class="price-row">
+                        <span class="price-new">$29.99</span>
+                        <span class="price-old">$59.98</span>
+                    </div>
+                    <a href="https://wa.me/5491123456789?text=Hola%20MegaTienda%20Drop%2C%20estoy%20interesado%20en%20el%20Producto%2056%20%28Tecnolog%C3%ADa%29%20por%20%2429.99.%20Deseo%20solicitar%20el%20Pago%20Contra%20Entrega." target="_blank" class="btn-whatsapp">
+                        💬 Pedir por WhatsApp
+                    </a>
+                </div>
+            </div>
+            <!-- Producto 57 -->
+            <div class="product-card" data-category="Hogar" data-title="Producto Innovador 57">
+                <div class="product-img">
+                    <span class="badge-tag">OFERTA</span>
+                    [Foto Producto 57]
+                </div>
+                <div class="product-info">
+                    <span class="product-cat">Hogar</span>
+                    <h2 class="product-title">Producto Innovador 57 - Solución Inteligente</h2>
+                    <div class="price-row">
+                        <span class="price-new">$39.99</span>
+                        <span class="price-old">$79.98</span>
+                    </div>
+                    <a href="https://wa.me/5491123456789?text=Hola%20MegaTienda%20Drop%2C%20estoy%20interesado%20en%20el%20Producto%2057%20%28Hogar%29%20por%20%2439.99.%20Deseo%20solicitar%20el%20Pago%20Contra%20Entrega." target="_blank" class="btn-whatsapp">
+                        💬 Pedir por WhatsApp
+                    </a>
+                </div>
+            </div>
+            <!-- Producto 58 -->
+            <div class="product-card" data-category="Belleza" data-title="Producto Innovador 58">
+                <div class="product-img">
+                    <span class="badge-tag">OFERTA</span>
+                    [Foto Producto 58]
+                </div>
+                <div class="product-info">
+                    <span class="product-cat">Belleza</span>
+                    <h2 class="product-title">Producto Innovador 58 - Solución Inteligente</h2>
+                    <div class="price-row">
+                        <span class="price-new">$49.99</span>
+                        <span class="price-old">$99.98</span>
+                    </div>
+                    <a href="https://wa.me/5491123456789?text=Hola%20MegaTienda%20Drop%2C%20estoy%20interesado%20en%20el%20Producto%2058%20%28Belleza%29%20por%20%2449.99.%20Deseo%20solicitar%20el%20Pago%20Contra%20Entrega." target="_blank" class="btn-whatsapp">
+                        💬 Pedir por WhatsApp
+                    </a>
+                </div>
+            </div>
+            <!-- Producto 59 -->
+            <div class="product-card" data-category="Deportes" data-title="Producto Innovador 59">
+                <div class="product-img">
+                    <span class="badge-tag">OFERTA</span>
+                    [Foto Producto 59]
+                </div>
+                <div class="product-info">
+                    <span class="product-cat">Deportes</span>
+                    <h2 class="product-title">Producto Innovador 59 - Solución Inteligente</h2>
+                    <div class="price-row">
+                        <span class="price-new">$12.5</span>
+                        <span class="price-old">$25.0</span>
+                    </div>
+                    <a href="https://wa.me/5491123456789?text=Hola%20MegaTienda%20Drop%2C%20estoy%20interesado%20en%20el%20Producto%2059%20%28Deportes%29%20por%20%2412.5.%20Deseo%20solicitar%20el%20Pago%20Contra%20Entrega." target="_blank" class="btn-whatsapp">
+                        💬 Pedir por WhatsApp
+                    </a>
+                </div>
+            </div>
+            <!-- Producto 60 -->
+            <div class="product-card" data-category="Tecnología" data-title="Producto Innovador 60">
+                <div class="product-img">
+                    <span class="badge-tag">OFERTA</span>
+                    [Foto Producto 60]
+                </div>
+                <div class="product-info">
+                    <span class="product-cat">Tecnología</span>
+                    <h2 class="product-title">Producto Innovador 60 - Solución Inteligente</h2>
+                    <div class="price-row">
+                        <span class="price-new">$25.99</span>
+                        <span class="price-old">$51.98</span>
+                    </div>
+                    <a href="https://wa.me/5491123456789?text=Hola%20MegaTienda%20Drop%2C%20estoy%20interesado%20en%20el%20Producto%2060%20%28Tecnolog%C3%ADa%29%20por%20%2425.99.%20Deseo%20solicitar%20el%20Pago%20Contra%20Entrega." target="_blank" class="btn-whatsapp">
+                        💬 Pedir por WhatsApp
+                    </a>
+                </div>
+            </div>
+            <!-- Producto 61 -->
+            <div class="product-card" data-category="Hogar" data-title="Producto Innovador 61">
+                <div class="product-img">
+                    <span class="badge-tag">OFERTA</span>
+                    [Foto Producto 61]
+                </div>
+                <div class="product-info">
+                    <span class="product-cat">Hogar</span>
+                    <h2 class="product-title">Producto Innovador 61 - Solución Inteligente</h2>
+                    <div class="price-row">
+                        <span class="price-new">$19.99</span>
+                        <span class="price-old">$39.98</span>
+                    </div>
+                    <a href="https://wa.me/5491123456789?text=Hola%20MegaTienda%20Drop%2C%20estoy%20interesado%20en%20el%20Producto%2061%20%28Hogar%29%20por%20%2419.99.%20Deseo%20solicitar%20el%20Pago%20Contra%20Entrega." target="_blank" class="btn-whatsapp">
+                        💬 Pedir por WhatsApp
+                    </a>
+                </div>
+            </div>
+            <!-- Producto 62 -->
+            <div class="product-card" data-category="Belleza" data-title="Producto Innovador 62">
+                <div class="product-img">
+                    <span class="badge-tag">OFERTA</span>
+                    [Foto Producto 62]
+                </div>
+                <div class="product-info">
+                    <span class="product-cat">Belleza</span>
+                    <h2 class="product-title">Producto Innovador 62 - Solución Inteligente</h2>
+                    <div class="price-row">
+                        <span class="price-new">$14.99</span>
+                        <span class="price-old">$29.98</span>
+                    </div>
+                    <a href="https://wa.me/5491123456789?text=Hola%20MegaTienda%20Drop%2C%20estoy%20interesado%20en%20el%20Producto%2062%20%28Belleza%29%20por%20%2414.99.%20Deseo%20solicitar%20el%20Pago%20Contra%20Entrega." target="_blank" class="btn-whatsapp">
+                        💬 Pedir por WhatsApp
+                    </a>
+                </div>
+            </div>
+            <!-- Producto 63 -->
+            <div class="product-card" data-category="Deportes" data-title="Producto Innovador 63">
+                <div class="product-img">
+                    <span class="badge-tag">OFERTA</span>
+                    [Foto Producto 63]
+                </div>
+                <div class="product-info">
+                    <span class="product-cat">Deportes</span>
+                    <h2 class="product-title">Producto Innovador 63 - Solución Inteligente</h2>
+                    <div class="price-row">
+                        <span class="price-new">$34.99</span>
+                        <span class="price-old">$69.98</span>
+                    </div>
+                    <a href="https://wa.me/5491123456789?text=Hola%20MegaTienda%20Drop%2C%20estoy%20interesado%20en%20el%20Producto%2063%20%28Deportes%29%20por%20%2434.99.%20Deseo%20solicitar%20el%20Pago%20Contra%20Entrega." target="_blank" class="btn-whatsapp">
+                        💬 Pedir por WhatsApp
+                    </a>
+                </div>
+            </div>
+            <!-- Producto 64 -->
+            <div class="product-card" data-category="Tecnología" data-title="Producto Innovador 64">
+                <div class="product-img">
+                    <span class="badge-tag">OFERTA</span>
+                    [Foto Producto 64]
+                </div>
+                <div class="product-info">
+                    <span class="product-cat">Tecnología</span>
+                    <h2 class="product-title">Producto Innovador 64 - Solución Inteligente</h2>
+                    <div class="price-row">
+                        <span class="price-new">$45.0</span>
+                        <span class="price-old">$90.0</span>
+                    </div>
+                    <a href="https://wa.me/5491123456789?text=Hola%20MegaTienda%20Drop%2C%20estoy%20interesado%20en%20el%20Producto%2064%20%28Tecnolog%C3%ADa%29%20por%20%2445.0.%20Deseo%20solicitar%20el%20Pago%20Contra%20Entrega." target="_blank" class="btn-whatsapp">
+                        💬 Pedir por WhatsApp
+                    </a>
+                </div>
+            </div>
+            <!-- Producto 65 -->
+            <div class="product-card" data-category="Hogar" data-title="Producto Innovador 65">
+                <div class="product-img">
+                    <span class="badge-tag">OFERTA</span>
+                    [Foto Producto 65]
+                </div>
+                <div class="product-info">
+                    <span class="product-cat">Hogar</span>
+                    <h2 class="product-title">Producto Innovador 65 - Solución Inteligente</h2>
+                    <div class="price-row">
+                        <span class="price-new">$9.99</span>
+                        <span class="price-old">$19.98</span>
+                    </div>
+                    <a href="https://wa.me/5491123456789?text=Hola%20MegaTienda%20Drop%2C%20estoy%20interesado%20en%20el%20Producto%2065%20%28Hogar%29%20por%20%249.99.%20Deseo%20solicitar%20el%20Pago%20Contra%20Entrega." target="_blank" class="btn-whatsapp">
+                        💬 Pedir por WhatsApp
+                    </a>
+                </div>
+            </div>
+            <!-- Producto 66 -->
+            <div class="product-card" data-category="Belleza" data-title="Producto Innovador 66">
+                <div class="product-img">
+                    <span class="badge-tag">OFERTA</span>
+                    [Foto Producto 66]
+                </div>
+                <div class="product-info">
+                    <span class="product-cat">Belleza</span>
+                    <h2 class="product-title">Producto Innovador 66 - Solución Inteligente</h2>
+                    <div class="price-row">
+                        <span class="price-new">$29.99</span>
+                        <span class="price-old">$59.98</span>
+                    </div>
+                    <a href="https://wa.me/5491123456789?text=Hola%20MegaTienda%20Drop%2C%20estoy%20interesado%20en%20el%20Producto%2066%20%28Belleza%29%20por%20%2429.99.%20Deseo%20solicitar%20el%20Pago%20Contra%20Entrega." target="_blank" class="btn-whatsapp">
+                        💬 Pedir por WhatsApp
+                    </a>
+                </div>
+            </div>
+            <!-- Producto 67 -->
+            <div class="product-card" data-category="Deportes" data-title="Producto Innovador 67">
+                <div class="product-img">
+                    <span class="badge-tag">OFERTA</span>
+                    [Foto Producto 67]
+                </div>
+                <div class="product-info">
+                    <span class="product-cat">Deportes</span>
+                    <h2 class="product-title">Producto Innovador 67 - Solución Inteligente</h2>
+                    <div class="price-row">
+                        <span class="price-new">$39.99</span>
+                        <span class="price-old">$79.98</span>
+                    </div>
+                    <a href="https://wa.me/5491123456789?text=Hola%20MegaTienda%20Drop%2C%20estoy%20interesado%20en%20el%20Producto%2067%20%28Deportes%29%20por%20%2439.99.%20Deseo%20solicitar%20el%20Pago%20Contra%20Entrega." target="_blank" class="btn-whatsapp">
+                        💬 Pedir por WhatsApp
+                    </a>
+                </div>
+            </div>
+            <!-- Producto 68 -->
+            <div class="product-card" data-category="Tecnología" data-title="Producto Innovador 68">
+                <div class="product-img">
+                    <span class="badge-tag">OFERTA</span>
+                    [Foto Producto 68]
+                </div>
+                <div class="product-info">
+                    <span class="product-cat">Tecnología</span>
+                    <h2 class="product-title">Producto Innovador 68 - Solución Inteligente</h2>
+                    <div class="price-row">
+                        <span class="price-new">$49.99</span>
+                        <span class="price-old">$99.98</span>
+                    </div>
+                    <a href="https://wa.me/5491123456789?text=Hola%20MegaTienda%20Drop%2C%20estoy%20interesado%20en%20el%20Producto%2068%20%28Tecnolog%C3%ADa%29%20por%20%2449.99.%20Deseo%20solicitar%20el%20Pago%20Contra%20Entrega." target="_blank" class="btn-whatsapp">
+                        💬 Pedir por WhatsApp
+                    </a>
+                </div>
+            </div>
+            <!-- Producto 69 -->
+            <div class="product-card" data-category="Hogar" data-title="Producto Innovador 69">
+                <div class="product-img">
+                    <span class="badge-tag">OFERTA</span>
+                    [Foto Producto 69]
+                </div>
+                <div class="product-info">
+                    <span class="product-cat">Hogar</span>
+                    <h2 class="product-title">Producto Innovador 69 - Solución Inteligente</h2>
+                    <div class="price-row">
+                        <span class="price-new">$12.5</span>
+                        <span class="price-old">$25.0</span>
+                    </div>
+                    <a href="https://wa.me/5491123456789?text=Hola%20MegaTienda%20Drop%2C%20estoy%20interesado%20en%20el%20Producto%2069%20%28Hogar%29%20por%20%2412.5.%20Deseo%20solicitar%20el%20Pago%20Contra%20Entrega." target="_blank" class="btn-whatsapp">
+                        💬 Pedir por WhatsApp
+                    </a>
+                </div>
+            </div>
+            <!-- Producto 70 -->
+            <div class="product-card" data-category="Belleza" data-title="Producto Innovador 70">
+                <div class="product-img">
+                    <span class="badge-tag">OFERTA</span>
+                    [Foto Producto 70]
+                </div>
+                <div class="product-info">
+                    <span class="product-cat">Belleza</span>
+                    <h2 class="product-title">Producto Innovador 70 - Solución Inteligente</h2>
+                    <div class="price-row">
+                        <span class="price-new">$25.99</span>
+                        <span class="price-old">$51.98</span>
+                    </div>
+                    <a href="https://wa.me/5491123456789?text=Hola%20MegaTienda%20Drop%2C%20estoy%20interesado%20en%20el%20Producto%2070%20%28Belleza%29%20por%20%2425.99.%20Deseo%20solicitar%20el%20Pago%20Contra%20Entrega." target="_blank" class="btn-whatsapp">
+                        💬 Pedir por WhatsApp
+                    </a>
+                </div>
+            </div>
+            <!-- Producto 71 -->
+            <div class="product-card" data-category="Deportes" data-title="Producto Innovador 71">
+                <div class="product-img">
+                    <span class="badge-tag">OFERTA</span>
+                    [Foto Producto 71]
+                </div>
+                <div class="product-info">
+                    <span class="product-cat">Deportes</span>
+                    <h2 class="product-title">Producto Innovador 71 - Solución Inteligente</h2>
+                    <div class="price-row">
+                        <span class="price-new">$19.99</span>
+                        <span class="price-old">$39.98</span>
+                    </div>
+                    <a href="https://wa.me/5491123456789?text=Hola%20MegaTienda%20Drop%2C%20estoy%20interesado%20en%20el%20Producto%2071%20%28Deportes%29%20por%20%2419.99.%20Deseo%20solicitar%20el%20Pago%20Contra%20Entrega." target="_blank" class="btn-whatsapp">
+                        💬 Pedir por WhatsApp
+                    </a>
+                </div>
+            </div>
+            <!-- Producto 72 -->
+            <div class="product-card" data-category="Tecnología" data-title="Producto Innovador 72">
+                <div class="product-img">
+                    <span class="badge-tag">OFERTA</span>
+                    [Foto Producto 72]
+                </div>
+                <div class="product-info">
+                    <span class="product-cat">Tecnología</span>
+                    <h2 class="product-title">Producto Innovador 72 - Solución Inteligente</h2>
+                    <div class="price-row">
+                        <span class="price-new">$14.99</span>
+                        <span class="price-old">$29.98</span>
+                    </div>
+                    <a href="https://wa.me/5491123456789?text=Hola%20MegaTienda%20Drop%2C%20estoy%20interesado%20en%20el%20Producto%2072%20%28Tecnolog%C3%ADa%29%20por%20%2414.99.%20Deseo%20solicitar%20el%20Pago%20Contra%20Entrega." target="_blank" class="btn-whatsapp">
+                        💬 Pedir por WhatsApp
+                    </a>
+                </div>
+            </div>
+            <!-- Producto 73 -->
+            <div class="product-card" data-category="Hogar" data-title="Producto Innovador 73">
+                <div class="product-img">
+                    <span class="badge-tag">OFERTA</span>
+                    [Foto Producto 73]
+                </div>
+                <div class="product-info">
+                    <span class="product-cat">Hogar</span>
+                    <h2 class="product-title">Producto Innovador 73 - Solución Inteligente</h2>
+                    <div class="price-row">
+                        <span class="price-new">$34.99</span>
+                        <span class="price-old">$69.98</span>
+                    </div>
+                    <a href="https://wa.me/5491123456789?text=Hola%20MegaTienda%20Drop%2C%20estoy%20interesado%20en%20el%20Producto%2073%20%28Hogar%29%20por%20%2434.99.%20Deseo%20solicitar%20el%20Pago%20Contra%20Entrega." target="_blank" class="btn-whatsapp">
+                        💬 Pedir por WhatsApp
+                    </a>
+                </div>
+            </div>
+            <!-- Producto 74 -->
+            <div class="product-card" data-category="Belleza" data-title="Producto Innovador 74">
+                <div class="product-img">
+                    <span class="badge-tag">OFERTA</span>
+                    [Foto Producto 74]
+                </div>
+                <div class="product-info">
+                    <span class="product-cat">Belleza</span>
+                    <h2 class="product-title">Producto Innovador 74 - Solución Inteligente</h2>
+                    <div class="price-row">
+                        <span class="price-new">$45.0</span>
+                        <span class="price-old">$90.0</span>
+                    </div>
+                    <a href="https://wa.me/5491123456789?text=Hola%20MegaTienda%20Drop%2C%20estoy%20interesado%20en%20el%20Producto%2074%20%28Belleza%29%20por%20%2445.0.%20Deseo%20solicitar%20el%20Pago%20Contra%20Entrega." target="_blank" class="btn-whatsapp">
+                        💬 Pedir por WhatsApp
+                    </a>
+                </div>
+            </div>
+            <!-- Producto 75 -->
+            <div class="product-card" data-category="Deportes" data-title="Producto Innovador 75">
+                <div class="product-img">
+                    <span class="badge-tag">OFERTA</span>
+                    [Foto Producto 75]
+                </div>
+                <div class="product-info">
+                    <span class="product-cat">Deportes</span>
+                    <h2 class="product-title">Producto Innovador 75 - Solución Inteligente</h2>
+                    <div class="price-row">
+                        <span class="price-new">$9.99</span>
+                        <span class="price-old">$19.98</span>
+                    </div>
+                    <a href="https://wa.me/5491123456789?text=Hola%20MegaTienda%20Drop%2C%20estoy%20interesado%20en%20el%20Producto%2075%20%28Deportes%29%20por%20%249.99.%20Deseo%20solicitar%20el%20Pago%20Contra%20Entrega." target="_blank" class="btn-whatsapp">
+                        💬 Pedir por WhatsApp
+                    </a>
+                </div>
+            </div>
+            <!-- Producto 76 -->
+            <div class="product-card" data-category="Tecnología" data-title="Producto Innovador 76">
+                <div class="product-img">
+                    <span class="badge-tag">OFERTA</span>
+                    [Foto Producto 76]
+                </div>
+                <div class="product-info">
+                    <span class="product-cat">Tecnología</span>
+                    <h2 class="product-title">Producto Innovador 76 - Solución Inteligente</h2>
+                    <div class="price-row">
+                        <span class="price-new">$29.99</span>
+                        <span class="price-old">$59.98</span>
+                    </div>
+                    <a href="https://wa.me/5491123456789?text=Hola%20MegaTienda%20Drop%2C%20estoy%20interesado%20en%20el%20Producto%2076%20%28Tecnolog%C3%ADa%29%20por%20%2429.99.%20Deseo%20solicitar%20el%20Pago%20Contra%20Entrega." target="_blank" class="btn-whatsapp">
+                        💬 Pedir por WhatsApp
+                    </a>
+                </div>
+            </div>
+            <!-- Producto 77 -->
+            <div class="product-card" data-category="Hogar" data-title="Producto Innovador 77">
+                <div class="product-img">
+                    <span class="badge-tag">OFERTA</span>
+                    [Foto Producto 77]
+                </div>
+                <div class="product-info">
+                    <span class="product-cat">Hogar</span>
+                    <h2 class="product-title">Producto Innovador 77 - Solución Inteligente</h2>
+                    <div class="price-row">
+                        <span class="price-new">$39.99</span>
+                        <span class="price-old">$79.98</span>
+                    </div>
+                    <a href="https://wa.me/5491123456789?text=Hola%20MegaTienda%20Drop%2C%20estoy%20interesado%20en%20el%20Producto%2077%20%28Hogar%29%20por%20%2439.99.%20Deseo%20solicitar%20el%20Pago%20Contra%20Entrega." target="_blank" class="btn-whatsapp">
+                        💬 Pedir por WhatsApp
+                    </a>
+                </div>
+            </div>
+            <!-- Producto 78 -->
+            <div class="product-card" data-category="Belleza" data-title="Producto Innovador 78">
+                <div class="product-img">
+                    <span class="badge-tag">OFERTA</span>
+                    [Foto Producto 78]
+                </div>
+                <div class="product-info">
+                    <span class="product-cat">Belleza</span>
+                    <h2 class="product-title">Producto Innovador 78 - Solución Inteligente</h2>
+                    <div class="price-row">
+                        <span class="price-new">$49.99</span>
+                        <span class="price-old">$99.98</span>
+                    </div>
+                    <a href="https://wa.me/5491123456789?text=Hola%20MegaTienda%20Drop%2C%20estoy%20interesado%20en%20el%20Producto%2078%20%28Belleza%29%20por%20%2449.99.%20Deseo%20solicitar%20el%20Pago%20Contra%20Entrega." target="_blank" class="btn-whatsapp">
+                        💬 Pedir por WhatsApp
+                    </a>
+                </div>
+            </div>
+            <!-- Producto 79 -->
+            <div class="product-card" data-category="Deportes" data-title="Producto Innovador 79">
+                <div class="product-img">
+                    <span class="badge-tag">OFERTA</span>
+                    [Foto Producto 79]
+                </div>
+                <div class="product-info">
+                    <span class="product-cat">Deportes</span>
+                    <h2 class="product-title">Producto Innovador 79 - Solución Inteligente</h2>
+                    <div class="price-row">
+                        <span class="price-new">$12.5</span>
+                        <span class="price-old">$25.0</span>
+                    </div>
+                    <a href="https://wa.me/5491123456789?text=Hola%20MegaTienda%20Drop%2C%20estoy%20interesado%20en%20el%20Producto%2079%20%28Deportes%29%20por%20%2412.5.%20Deseo%20solicitar%20el%20Pago%20Contra%20Entrega." target="_blank" class="btn-whatsapp">
+                        💬 Pedir por WhatsApp
+                    </a>
+                </div>
+            </div>
+            <!-- Producto 80 -->
+            <div class="product-card" data-category="Tecnología" data-title="Producto Innovador 80">
+                <div class="product-img">
+                    <span class="badge-tag">OFERTA</span>
+                    [Foto Producto 80]
+                </div>
+                <div class="product-info">
+                    <span class="product-cat">Tecnología</span>
+                    <h2 class="product-title">Producto Innovador 80 - Solución Inteligente</h2>
+                    <div class="price-row">
+                        <span class="price-new">$25.99</span>
+                        <span class="price-old">$51.98</span>
+                    </div>
+                    <a href="https://wa.me/5491123456789?text=Hola%20MegaTienda%20Drop%2C%20estoy%20interesado%20en%20el%20Producto%2080%20%28Tecnolog%C3%ADa%29%20por%20%2425.99.%20Deseo%20solicitar%20el%20Pago%20Contra%20Entrega." target="_blank" class="btn-whatsapp">
+                        💬 Pedir por WhatsApp
+                    </a>
+                </div>
+            </div>
+            <!-- Producto 81 -->
+            <div class="product-card" data-category="Hogar" data-title="Producto Innovador 81">
+                <div class="product-img">
+                    <span class="badge-tag">OFERTA</span>
+                    [Foto Producto 81]
+                </div>
+                <div class="product-info">
+                    <span class="product-cat">Hogar</span>
+                    <h2 class="product-title">Producto Innovador 81 - Solución Inteligente</h2>
+                    <div class="price-row">
+                        <span class="price-new">$19.99</span>
+                        <span class="price-old">$39.98</span>
+                    </div>
+                    <a href="https://wa.me/5491123456789?text=Hola%20MegaTienda%20Drop%2C%20estoy%20interesado%20en%20el%20Producto%2081%20%28Hogar%29%20por%20%2419.99.%20Deseo%20solicitar%20el%20Pago%20Contra%20Entrega." target="_blank" class="btn-whatsapp">
+                        💬 Pedir por WhatsApp
+                    </a>
+                </div>
+            </div>
+            <!-- Producto 82 -->
+            <div class="product-card" data-category="Belleza" data-title="Producto Innovador 82">
+                <div class="product-img">
+                    <span class="badge-tag">OFERTA</span>
+                    [Foto Producto 82]
+                </div>
+                <div class="product-info">
+                    <span class="product-cat">Belleza</span>
+                    <h2 class="product-title">Producto Innovador 82 - Solución Inteligente</h2>
+                    <div class="price-row">
+                        <span class="price-new">$14.99</span>
+                        <span class="price-old">$29.98</span>
+                    </div>
+                    <a href="https://wa.me/5491123456789?text=Hola%20MegaTienda%20Drop%2C%20estoy%20interesado%20en%20el%20Producto%2082%20%28Belleza%29%20por%20%2414.99.%20Deseo%20solicitar%20el%20Pago%20Contra%20Entrega." target="_blank" class="btn-whatsapp">
+                        💬 Pedir por WhatsApp
+                    </a>
+                </div>
+            </div>
+            <!-- Producto 83 -->
+            <div class="product-card" data-category="Deportes" data-title="Producto Innovador 83">
+                <div class="product-img">
+                    <span class="badge-tag">OFERTA</span>
+                    [Foto Producto 83]
+                </div>
+                <div class="product-info">
+                    <span class="product-cat">Deportes</span>
+                    <h2 class="product-title">Producto Innovador 83 - Solución Inteligente</h2>
+                    <div class="price-row">
+                        <span class="price-new">$34.99</span>
+                        <span class="price-old">$69.98</span>
+                    </div>
+                    <a href="https://wa.me/5491123456789?text=Hola%20MegaTienda%20Drop%2C%20estoy%20interesado%20en%20el%20Producto%2083%20%28Deportes%29%20por%20%2434.99.%20Deseo%20solicitar%20el%20Pago%20Contra%20Entrega." target="_blank" class="btn-whatsapp">
+                        💬 Pedir por WhatsApp
+                    </a>
+                </div>
+            </div>
+            <!-- Producto 84 -->
+            <div class="product-card" data-category="Tecnología" data-title="Producto Innovador 84">
+                <div class="product-img">
+                    <span class="badge-tag">OFERTA</span>
+                    [Foto Producto 84]
+                </div>
+                <div class="product-info">
+                    <span class="product-cat">Tecnología</span>
+                    <h2 class="product-title">Producto Innovador 84 - Solución Inteligente</h2>
+                    <div class="price-row">
+                        <span class="price-new">$45.0</span>
+                        <span class="price-old">$90.0</span>
+                    </div>
+                    <a href="https://wa.me/5491123456789?text=Hola%20MegaTienda%20Drop%2C%20estoy%20interesado%20en%20el%20Producto%2084%20%28Tecnolog%C3%ADa%29%20por%20%2445.0.%20Deseo%20solicitar%20el%20Pago%20Contra%20Entrega." target="_blank" class="btn-whatsapp">
+                        💬 Pedir por WhatsApp
+                    </a>
+                </div>
+            </div>
+            <!-- Producto 85 -->
+            <div class="product-card" data-category="Hogar" data-title="Producto Innovador 85">
+                <div class="product-img">
+                    <span class="badge-tag">OFERTA</span>
+                    [Foto Producto 85]
+                </div>
+                <div class="product-info">
+                    <span class="product-cat">Hogar</span>
+                    <h2 class="product-title">Producto Innovador 85 - Solución Inteligente</h2>
+                    <div class="price-row">
+                        <span class="price-new">$9.99</span>
+                        <span class="price-old">$19.98</span>
+                    </div>
+                    <a href="https://wa.me/5491123456789?text=Hola%20MegaTienda%20Drop%2C%20estoy%20interesado%20en%20el%20Producto%2085%20%28Hogar%29%20por%20%249.99.%20Deseo%20solicitar%20el%20Pago%20Contra%20Entrega." target="_blank" class="btn-whatsapp">
+                        💬 Pedir por WhatsApp
+                    </a>
+                </div>
+            </div>
+            <!-- Producto 86 -->
+            <div class="product-card" data-category="Belleza" data-title="Producto Innovador 86">
+                <div class="product-img">
+                    <span class="badge-tag">OFERTA</span>
+                    [Foto Producto 86]
+                </div>
+                <div class="product-info">
+                    <span class="product-cat">Belleza</span>
+                    <h2 class="product-title">Producto Innovador 86 - Solución Inteligente</h2>
+                    <div class="price-row">
+                        <span class="price-new">$29.99</span>
+                        <span class="price-old">$59.98</span>
+                    </div>
+                    <a href="https://wa.me/5491123456789?text=Hola%20MegaTienda%20Drop%2C%20estoy%20interesado%20en%20el%20Producto%2086%20%28Belleza%29%20por%20%2429.99.%20Deseo%20solicitar%20el%20Pago%20Contra%20Entrega." target="_blank" class="btn-whatsapp">
+                        💬 Pedir por WhatsApp
+                    </a>
+                </div>
+            </div>
+            <!-- Producto 87 -->
+            <div class="product-card" data-category="Deportes" data-title="Producto Innovador 87">
+                <div class="product-img">
+                    <span class="badge-tag">OFERTA</span>
+                    [Foto Producto 87]
+                </div>
+                <div class="product-info">
+                    <span class="product-cat">Deportes</span>
+                    <h2 class="product-title">Producto Innovador 87 - Solución Inteligente</h2>
+                    <div class="price-row">
+                        <span class="price-new">$39.99</span>
+                        <span class="price-old">$79.98</span>
+                    </div>
+                    <a href="https://wa.me/5491123456789?text=Hola%20MegaTienda%20Drop%2C%20estoy%20interesado%20en%20el%20Producto%2087%20%28Deportes%29%20por%20%2439.99.%20Deseo%20solicitar%20el%20Pago%20Contra%20Entrega." target="_blank" class="btn-whatsapp">
+                        💬 Pedir por WhatsApp
+                    </a>
+                </div>
+            </div>
+            <!-- Producto 88 -->
+            <div class="product-card" data-category="Tecnología" data-title="Producto Innovador 88">
+                <div class="product-img">
+                    <span class="badge-tag">OFERTA</span>
+                    [Foto Producto 88]
+                </div>
+                <div class="product-info">
+                    <span class="product-cat">Tecnología</span>
+                    <h2 class="product-title">Producto Innovador 88 - Solución Inteligente</h2>
+                    <div class="price-row">
+                        <span class="price-new">$49.99</span>
+                        <span class="price-old">$99.98</span>
+                    </div>
+                    <a href="https://wa.me/5491123456789?text=Hola%20MegaTienda%20Drop%2C%20estoy%20interesado%20en%20el%20Producto%2088%20%28Tecnolog%C3%ADa%29%20por%20%2449.99.%20Deseo%20solicitar%20el%20Pago%20Contra%20Entrega." target="_blank" class="btn-whatsapp">
+                        💬 Pedir por WhatsApp
+                    </a>
+                </div>
+            </div>
+            <!-- Producto 89 -->
+            <div class="product-card" data-category="Hogar" data-title="Producto Innovador 89">
+                <div class="product-img">
+                    <span class="badge-tag">OFERTA</span>
+                    [Foto Producto 89]
+                </div>
+                <div class="product-info">
+                    <span class="product-cat">Hogar</span>
+                    <h2 class="product-title">Producto Innovador 89 - Solución Inteligente</h2>
+                    <div class="price-row">
+                        <span class="price-new">$12.5</span>
+                        <span class="price-old">$25.0</span>
+                    </div>
+                    <a href="https://wa.me/5491123456789?text=Hola%20MegaTienda%20Drop%2C%20estoy%20interesado%20en%20el%20Producto%2089%20%28Hogar%29%20por%20%2412.5.%20Deseo%20solicitar%20el%20Pago%20Contra%20Entrega." target="_blank" class="btn-whatsapp">
+                        💬 Pedir por WhatsApp
+                    </a>
+                </div>
+            </div>
+            <!-- Producto 90 -->
+            <div class="product-card" data-category="Belleza" data-title="Producto Innovador 90">
+                <div class="product-img">
+                    <span class="badge-tag">OFERTA</span>
+                    [Foto Producto 90]
+                </div>
+                <div class="product-info">
+                    <span class="product-cat">Belleza</span>
+                    <h2 class="product-title">Producto Innovador 90 - Solución Inteligente</h2>
+                    <div class="price-row">
+                        <span class="price-new">$25.99</span>
+                        <span class="price-old">$51.98</span>
+                    </div>
+                    <a href="https://wa.me/5491123456789?text=Hola%20MegaTienda%20Drop%2C%20estoy%20interesado%20en%20el%20Producto%2090%20%28Belleza%29%20por%20%2425.99.%20Deseo%20solicitar%20el%20Pago%20Contra%20Entrega." target="_blank" class="btn-whatsapp">
+                        💬 Pedir por WhatsApp
+                    </a>
+                </div>
+            </div>
+            <!-- Producto 91 -->
+            <div class="product-card" data-category="Deportes" data-title="Producto Innovador 91">
+                <div class="product-img">
+                    <span class="badge-tag">OFERTA</span>
+                    [Foto Producto 91]
+                </div>
+                <div class="product-info">
+                    <span class="product-cat">Deportes</span>
+                    <h2 class="product-title">Producto Innovador 91 - Solución Inteligente</h2>
+                    <div class="price-row">
+                        <span class="price-new">$19.99</span>
+                        <span class="price-old">$39.98</span>
+                    </div>
+                    <a href="https://wa.me/5491123456789?text=Hola%20MegaTienda%20Drop%2C%20estoy%20interesado%20en%20el%20Producto%2091%20%28Deportes%29%20por%20%2419.99.%20Deseo%20solicitar%20el%20Pago%20Contra%20Entrega." target="_blank" class="btn-whatsapp">
+                        💬 Pedir por WhatsApp
+                    </a>
+                </div>
+            </div>
+            <!-- Producto 92 -->
+            <div class="product-card" data-category="Tecnología" data-title="Producto Innovador 92">
+                <div class="product-img">
+                    <span class="badge-tag">OFERTA</span>
+                    [Foto Producto 92]
+                </div>
+                <div class="product-info">
+                    <span class="product-cat">Tecnología</span>
+                    <h2 class="product-title">Producto Innovador 92 - Solución Inteligente</h2>
+                    <div class="price-row">
+                        <span class="price-new">$14.99</span>
+                        <span class="price-old">$29.98</span>
+                    </div>
+                    <a href="https://wa.me/5491123456789?text=Hola%20MegaTienda%20Drop%2C%20estoy%20interesado%20en%20el%20Producto%2092%20%28Tecnolog%C3%ADa%29%20por%20%2414.99.%20Deseo%20solicitar%20el%20Pago%20Contra%20Entrega." target="_blank" class="btn-whatsapp">
+                        💬 Pedir por WhatsApp
+                    </a>
+                </div>
+            </div>
+            <!-- Producto 93 -->
+            <div class="product-card" data-category="Hogar" data-title="Producto Innovador 93">
+                <div class="product-img">
+                    <span class="badge-tag">OFERTA</span>
+                    [Foto Producto 93]
+                </div>
+                <div class="product-info">
+                    <span class="product-cat">Hogar</span>
+                    <h2 class="product-title">Producto Innovador 93 - Solución Inteligente</h2>
+                    <div class="price-row">
+                        <span class="price-new">$34.99</span>
+                        <span class="price-old">$69.98</span>
+                    </div>
+                    <a href="https://wa.me/5491123456789?text=Hola%20MegaTienda%20Drop%2C%20estoy%20interesado%20en%20el%20Producto%2093%20%28Hogar%29%20por%20%2434.99.%20Deseo%20solicitar%20el%20Pago%20Contra%20Entrega." target="_blank" class="btn-whatsapp">
+                        💬 Pedir por WhatsApp
+                    </a>
+                </div>
+            </div>
+            <!-- Producto 94 -->
+            <div class="product-card" data-category="Belleza" data-title="Producto Innovador 94">
+                <div class="product-img">
+                    <span class="badge-tag">OFERTA</span>
+                    [Foto Producto 94]
+                </div>
+                <div class="product-info">
+                    <span class="product-cat">Belleza</span>
+                    <h2 class="product-title">Producto Innovador 94 - Solución Inteligente</h2>
+                    <div class="price-row">
+                        <span class="price-new">$45.0</span>
+                        <span class="price-old">$90.0</span>
+                    </div>
+                    <a href="https://wa.me/5491123456789?text=Hola%20MegaTienda%20Drop%2C%20estoy%20interesado%20en%20el%20Producto%2094%20%28Belleza%29%20por%20%2445.0.%20Deseo%20solicitar%20el%20Pago%20Contra%20Entrega." target="_blank" class="btn-whatsapp">
+                        💬 Pedir por WhatsApp
+                    </a>
+                </div>
+            </div>
+            <!-- Producto 95 -->
+            <div class="product-card" data-category="Deportes" data-title="Producto Innovador 95">
+                <div class="product-img">
+                    <span class="badge-tag">OFERTA</span>
+                    [Foto Producto 95]
+                </div>
+                <div class="product-info">
+                    <span class="product-cat">Deportes</span>
+                    <h2 class="product-title">Producto Innovador 95 - Solución Inteligente</h2>
+                    <div class="price-row">
+                        <span class="price-new">$9.99</span>
+                        <span class="price-old">$19.98</span>
+                    </div>
+                    <a href="https://wa.me/5491123456789?text=Hola%20MegaTienda%20Drop%2C%20estoy%20interesado%20en%20el%20Producto%2095%20%28Deportes%29%20por%20%249.99.%20Deseo%20solicitar%20el%20Pago%20Contra%20Entrega." target="_blank" class="btn-whatsapp">
+                        💬 Pedir por WhatsApp
+                    </a>
+                </div>
+            </div>
+            <!-- Producto 96 -->
+            <div class="product-card" data-category="Tecnología" data-title="Producto Innovador 96">
+                <div class="product-img">
+                    <span class="badge-tag">OFERTA</span>
+                    [Foto Producto 96]
+                </div>
+                <div class="product-info">
+                    <span class="product-cat">Tecnología</span>
+                    <h2 class="product-title">Producto Innovador 96 - Solución Inteligente</h2>
+                    <div class="price-row">
+                        <span class="price-new">$29.99</span>
+                        <span class="price-old">$59.98</span>
+                    </div>
+                    <a href="https://wa.me/5491123456789?text=Hola%20MegaTienda%20Drop%2C%20estoy%20interesado%20en%20el%20Producto%2096%20%28Tecnolog%C3%ADa%29%20por%20%2429.99.%20Deseo%20solicitar%20el%20Pago%20Contra%20Entrega." target="_blank" class="btn-whatsapp">
+                        💬 Pedir por WhatsApp
+                    </a>
+                </div>
+            </div>
+            <!-- Producto 97 -->
+            <div class="product-card" data-category="Hogar" data-title="Producto Innovador 97">
+                <div class="product-img">
+                    <span class="badge-tag">OFERTA</span>
+                    [Foto Producto 97]
+                </div>
+                <div class="product-info">
+                    <span class="product-cat">Hogar</span>
+                    <h2 class="product-title">Producto Innovador 97 - Solución Inteligente</h2>
+                    <div class="price-row">
+                        <span class="price-new">$39.99</span>
+                        <span class="price-old">$79.98</span>
+                    </div>
+                    <a href="https://wa.me/5491123456789?text=Hola%20MegaTienda%20Drop%2C%20estoy%20interesado%20en%20el%20Producto%2097%20%28Hogar%29%20por%20%2439.99.%20Deseo%20solicitar%20el%20Pago%20Contra%20Entrega." target="_blank" class="btn-whatsapp">
+                        💬 Pedir por WhatsApp
+                    </a>
+                </div>
+            </div>
+            <!-- Producto 98 -->
+            <div class="product-card" data-category="Belleza" data-title="Producto Innovador 98">
+                <div class="product-img">
+                    <span class="badge-tag">OFERTA</span>
+                    [Foto Producto 98]
+                </div>
+                <div class="product-info">
+                    <span class="product-cat">Belleza</span>
+                    <h2 class="product-title">Producto Innovador 98 - Solución Inteligente</h2>
+                    <div class="price-row">
+                        <span class="price-new">$49.99</span>
+                        <span class="price-old">$99.98</span>
+                    </div>
+                    <a href="https://wa.me/5491123456789?text=Hola%20MegaTienda%20Drop%2C%20estoy%20interesado%20en%20el%20Producto%2098%20%28Belleza%29%20por%20%2449.99.%20Deseo%20solicitar%20el%20Pago%20Contra%20Entrega." target="_blank" class="btn-whatsapp">
+                        💬 Pedir por WhatsApp
+                    </a>
+                </div>
+            </div>
+            <!-- Producto 99 -->
+            <div class="product-card" data-category="Deportes" data-title="Producto Innovador 99">
+                <div class="product-img">
+                    <span class="badge-tag">OFERTA</span>
+                    [Foto Producto 99]
+                </div>
+                <div class="product-info">
+                    <span class="product-cat">Deportes</span>
+                    <h2 class="product-title">Producto Innovador 99 - Solución Inteligente</h2>
+                    <div class="price-row">
+                        <span class="price-new">$12.5</span>
+                        <span class="price-old">$25.0</span>
+                    </div>
+                    <a href="https://wa.me/5491123456789?text=Hola%20MegaTienda%20Drop%2C%20estoy%20interesado%20en%20el%20Producto%2099%20%28Deportes%29%20por%20%2412.5.%20Deseo%20solicitar%20el%20Pago%20Contra%20Entrega." target="_blank" class="btn-whatsapp">
+                        💬 Pedir por WhatsApp
+                    </a>
+                </div>
+            </div>
+            <!-- Producto 100 -->
+            <div class="product-card" data-category="Tecnología" data-title="Producto Innovador 100">
+                <div class="product-img">
+                    <span class="badge-tag">OFERTA</span>
+                    [Foto Producto 100]
+                </div>
+                <div class="product-info">
+                    <span class="product-cat">Tecnología</span>
+                    <h2 class="product-title">Producto Innovador 100 - Solución Inteligente</h2>
+                    <div class="price-row">
+                        <span class="price-new">$25.99</span>
+                        <span class="price-old">$51.98</span>
+                    </div>
+                    <a href="https://wa.me/5491123456789?text=Hola%20MegaTienda%20Drop%2C%20estoy%20interesado%20en%20el%20Producto%20100%20%28Tecnolog%C3%ADa%29%20por%20%2425.99.%20Deseo%20solicitar%20el%20Pago%20Contra%20Entrega." target="_blank" class="btn-whatsapp">
+                        💬 Pedir por WhatsApp
+                    </a>
+                </div>
+            </div>
+            -->
+        </main>
+    </div>
+
+    <script>
+        // Función para filtrar por barra de búsqueda
+        function filterProducts() {
+            let input = document.getElementById('searchInput').value.toLowerCase();
+            let cards = document.getElementsByClassName('product-card');
+            
+            for (let i = 0; i < cards.length; i++) {
+                let title = cards[i].getAttribute('data-title').toLowerCase();
+                if (title.includes(input)) {
+                    cards[i].style.display = "";
+                } else {
+                    cards[i].style.display = "none";
+                }
+            }
+        }
+
+        // Función para filtrar por categorías en la barra lateral
+        function filterCategory(cat) {
+            // Manejar clase activa
+            let links = document.querySelectorAll('.filter-list a');
+            links.forEach(link => link.classList.remove('active'));
+            event.target.classList.add('active');
+
+            let cards = document.getElementsByClassName('product-card');
+            for (let i = 0; i < cards.length; i++) {
+                let itemCat = cards[i].getAttribute('data-category');
+                if (cat === 'todos' || itemCat === cat) {
+                    cards[i].style.display = "";
+                } else {
+                    cards[i].style.display = "none";
+                }
+            }
+        }
+    </script>
+</body>
+</html>
